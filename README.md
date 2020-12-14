@@ -5,5 +5,5 @@ FruitsMix
 
 改修前: Cocos2d-x 改修後: Unity
 
-作品紹介動画はこちら
+作品紹介動画はこちら！
 https://www.youtube.com/watch?v=fk4uUUOVgSo

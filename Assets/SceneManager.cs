@@ -34,6 +34,7 @@ public class SceneManager : MonoBehaviour
     }
     void Update()
     {
+#if false
         switch(eSceneState)
         {
             case SceneStateEnum.eTitle:
@@ -43,5 +44,6 @@ public class SceneManager : MonoBehaviour
             case SceneStateEnum.eMain:
             break;
         }
+#endif
     }
 }

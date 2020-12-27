@@ -3,7 +3,12 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Apple
+  - Banana
+  - Greape
+  - Orange
+  - Suika
   layers:
   - Default
   - TransparentFX

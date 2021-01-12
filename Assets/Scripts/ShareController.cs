@@ -6,6 +6,11 @@ using UnityEngine.UI;
   
 public class ShareController : MonoBehaviour  
 {  
+
+    private void Start() {
+        Share();
+    }
+
     public void Share()  
     {  
         StartCoroutine(_Share());  
@@ -13,6 +18,7 @@ public class ShareController : MonoBehaviour
   
     public IEnumerator _Share()
     {
+        //string imgPath = Application.persistentDataPath + "/Assets/Resouces/Imeges/Pictures/image.png";
         string imgPath = Application.persistentDataPath + "/image.png";
 
         // 前回のデータを削除

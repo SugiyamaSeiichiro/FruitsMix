@@ -413,7 +413,7 @@ RectTransform:
   m_Children:
   - {fileID: 801601748}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -432,7 +432,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5df8590cb84674d86975cc2bd6fdd56e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameCommonScript: {fileID: 1387920065}
+  gameCommonScript: {fileID: 0}
   stageButtonPrefab: {fileID: 1494247237598090994, guid: 46425ddfea7df4fca9172f9b2286d43d, type: 3}
   stageButtonParent: {fileID: 1089552198}
 --- !u!1 &1030080414
@@ -657,55 +657,5 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1387920064
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1387920066}
-  - component: {fileID: 1387920065}
-  m_Layer: 0
-  m_Name: GameCommon
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1387920065
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1387920064}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4976c8ae49f2444e7b2ceac002842078, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  stageAllNum: 0
-  fruitsSpriteList:
-  - {fileID: 21300000, guid: 57bd797ae5a0e45e1bc442314204ff37, type: 3}
-  - {fileID: 21300000, guid: fc461373b2f5a4a8aae1bed6f2c45c51, type: 3}
-  - {fileID: 21300000, guid: f4e1a160053744b02a837c813c9c3484, type: 3}
-  - {fileID: 21300000, guid: 76b6acd2f1c8d42488012c466e66aafe, type: 3}
-  - {fileID: 21300000, guid: 6c6ba7fcedc2a46a78bcb7c1e9bfe602, type: 3}
---- !u!4 &1387920066
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1387920064}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

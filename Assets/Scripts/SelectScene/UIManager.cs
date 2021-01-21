@@ -7,14 +7,15 @@ namespace SelectScene
 {
     public class UIManager : MonoBehaviour
     {
-        public GameCommon gameCommonScript;
         public GameObject stageButtonPrefab;
         public GameObject stageButtonParent;
         private int stageNum;
         // Start is called before the first frame update
         void Start()
         {
-            for(int i = 0; i < this.gameCommonScript.stageAllNum; i++){
+            // 共通Script取得
+            GameCommon gameCommonScript = GameObject.Find("GameCommon").GetComponent<GameCommon>();
+            for(int i = 0; i < gameCommonScript.stageAllNum; i++){
                 GameObject obj = Instantiate(this.stageButtonPrefab);
                 obj.transform.SetParent(this.stageButtonParent.transform, false);
                 int stageNum = i + 1;

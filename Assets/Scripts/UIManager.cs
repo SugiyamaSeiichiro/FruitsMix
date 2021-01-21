@@ -18,35 +18,14 @@ namespace PlayScene
         public GameObject frutisCompMapParent;
         public GameObject gameClearUI;
         private readonly Dictionary<int, float> fruitsSizeList = new Dictionary<int, float>(){
-            {3, 45.0f},
-            {4, 30.0f},
-            {5, 25.0f},
+            {3, 55.0f},
+            {4, 40.0f},
+            {5, 32.0f},
         };
-        private readonly Dictionary<int, float> fruitsTypeOrderScaleList = new Dictionary<int, float>(){
-            {3, 22.0f},
-            {4, 22.0f},
-            {5, 18.0f},
-        };
-        private readonly Vector2 fruitsTypeOrderParentPosition = new Vector2(670.0f, 285.0f);
         private readonly Dictionary<int, List<Vector2>> fruitsTypeOrderPositionList = new Dictionary<int, List<Vector2>>(){
             {3, new List<Vector2>(){new Vector2(15.0f, 30.0f), new Vector2(30.0f,  0.0f), new Vector2(0.0f, 0.0f)}},
             {4, new List<Vector2>(){new Vector2( 0.0f, 30.0f), new Vector2(30.0f, 30.0f), new Vector2(30.0f, 0.0f), new Vector2(0.0f, 0.0f)}},
             {5, new List<Vector2>(){new Vector2( 5.0f, 30.0f), new Vector2(30.0f, 30.0f), new Vector2(40.0f, 0.0f), new Vector2(20.0f, 0.0f), new Vector2(0.0f, 0.0f)}},
-        };
-        private readonly Dictionary<int, float> fruitsCompMapScaleList = new Dictionary<int, float>(){
-            {3, 44.0f},
-            {4, 35.0f},
-            {5, 28.0f},
-        };
-        private readonly Dictionary<int, float> fruitsCompMapIntervalList = new Dictionary<int, float>(){
-            {3, 50.0f},
-            {4, 38.0f},
-            {5, 30.0f},
-        };
-        private readonly Dictionary<int, Vector2> fruitsCompMapPositionList = new Dictionary<int, Vector2>(){
-            {3, new Vector2(587.0f, 190.0f)},
-            {4, new Vector2(580.0f, 195.0f)},
-            {5, new Vector2(576.0f, 198.0f)},
         };
 
         // 初期処理
@@ -54,26 +33,22 @@ namespace PlayScene
         {
             // 方向条件テキスト設定
             this.setDirectionConditionText();
+            
             // 種類順番UI
             foreach(var type in this.gameManagerScript.fruitsTypeList.Select((v, i) => new {Value = v, Index = i })){
                 Vector2 position = this.fruitsTypeOrderPositionList[this.gameManagerScript.fruitsTypeList.Count][type.Index];
-                float scale = this.fruitsTypeOrderScaleList[this.gameManagerScript.fruitsTypeList.Count];
-                GameObject obj = this.getFruitsUI(position, scale, type.Value);
-                obj.transform.parent = this.fruitsTypeOrderParent.transform;
+                float size = 20.0f;
+                this.createFruitsUI(position, size, type.Value, this.fruitsTypeOrderParent);
             }
-            this.fruitsTypeOrderParent.transform.localPosition = fruitsTypeOrderParentPosition;
+            List<float> fruitsPosList = this.getFruitsPosList(this.gameManagerScript.squareNum);
             // 完成配置UI
             for(int i = 0; i < this.gameManagerScript.columnNum; i++){
                 for(int j = 0; j < this.gameManagerScript.rowNum; j++){
-                    float x = j * this.fruitsCompMapIntervalList[this.gameManagerScript.squareNum];
-                    float y = i * this.fruitsCompMapIntervalList[this.gameManagerScript.squareNum];
-                    Vector2 position = new Vector2( x, -y);
-                    float scale = this.fruitsCompMapScaleList[this.gameManagerScript.squareNum];
-                    GameObject obj = this.getFruitsUI(position, scale, this.gameManagerScript.compMap[i,j]);
-                    obj.transform.parent = this.frutisCompMapParent.transform;
+                    float size = this.fruitsSizeList[this.gameManagerScript.squareNum];
+                    Vector2 position = new Vector2( fruitsPosList[j], -fruitsPosList[i]);
+                    this.createFruitsUI(position, size, this.gameManagerScript.compMap[i,j], this.frutisCompMapParent);
                 }
             }
-            this.frutisCompMapParent.transform.localPosition = this.fruitsCompMapPositionList[this.gameManagerScript.squareNum];
         }
 
         // 方向条件テキスト設定
@@ -92,14 +67,36 @@ namespace PlayScene
             }
         }
 
+        private List<float> getFruitsPosList(int squareNum){
+            List<float> fruitsPosList = new List<float>();
+            float distance = this.fruitsSizeList[squareNum] * 1.2f;
+            float leftPos = 0;
+            // 偶数配置
+            if(squareNum % 2 == 0){
+                int num = squareNum / 2;
+                leftPos = -num * distance + distance/2;
+            // 奇数配置
+            }else{
+                int num = (squareNum - 1) / 2;
+                leftPos = -num * distance;
+            }
+            // 位置格納
+            for(int i = 0; i < squareNum; i++){
+                float pos = leftPos + (i * distance);
+                fruitsPosList.Add(pos);
+            }
+            return fruitsPosList;
+        }
+
         // フルーツUI取得
-        private GameObject getFruitsUI(Vector2 position, float scale, int type){
+        private void createFruitsUI(Vector2 position, float size, int type, GameObject parent){
             GameObject prefab = (GameObject)frutisCompMapPrefab;
             GameObject obj = Instantiate(prefab);
             obj.GetComponent<Image>().sprite = this.gameManagerScript.fruitsSpriteList[type];
-            obj.GetComponent<RectTransform>().anchoredPosition = position;
-            obj.GetComponent<RectTransform>().sizeDelta = new Vector2(scale, scale);
-            return obj;
+            obj.transform.SetParent(parent.transform, false);
+            RectTransform rectTransform = obj.GetComponent<RectTransform>();
+            rectTransform.sizeDelta = new Vector2(size, size);
+            rectTransform.anchoredPosition = position;
         }
 
         // ゲームクリアUI表示

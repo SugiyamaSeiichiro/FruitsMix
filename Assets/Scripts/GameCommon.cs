@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -64,16 +65,24 @@ public class GameCommon : MonoBehaviour
     // フルーツ初期配置取得
     public int[,] getFruitsInitMap(int stageNum){
         (int[,] init, int[,] comp) fruitsMap = this.fruitsMapList[stageNum - 1];
-        return fruitsMap.init;
+        int rowNum = this.getRowNum(stageNum);
+        int columnNum = this.getColumnNum(stageNum);
+        int[,] initMap = new int[columnNum, rowNum];
+        Array.Copy(fruitsMap.init, 0, initMap, 0, fruitsMap.init.Length);
+        return initMap;
     }
 
     // フルーツ完成配置取得
     public int[,] getFruitsCompMap(int stageNum){
         (int[,] init, int[,] comp) fruitsMap = this.fruitsMapList[stageNum - 1];
-        return fruitsMap.comp;
+        int rowNum = this.getRowNum(stageNum);
+        int columnNum = this.getColumnNum(stageNum);
+        int[,] compMap = new int[columnNum, rowNum];
+        Array.Copy(fruitsMap.comp, 0, compMap, 0, fruitsMap.comp.Length);
+        return compMap;
     }
 
-    // 
+    // 方向条件取得
     public Dictionary<string, bool> getDirectionConditionList(int stageNum){
         Dictionary<string, bool> directionConditionList = new Dictionary<string, bool>();
         if(this.stageDirectionConditionList.ContainsKey(stageNum)){

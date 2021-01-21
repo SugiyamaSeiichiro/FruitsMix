@@ -51,7 +51,8 @@ namespace PlayScene
             // 初期配置取得
             this.initMap = this.gameManagerScript.initMap;
             // 現在配置取得
-            this.curMap = this.initMap;
+            this.curMap = new int[this.columnNum, this.rowNum];
+            Array.Copy(this.initMap, 0, this.curMap, 0, this.initMap.Length);
             // 完成配置所得
             this.compMap = this.gameManagerScript.compMap;
             // 種類順番取得
@@ -98,6 +99,7 @@ namespace PlayScene
                     this.changeOtherFruitsObject(curType, mapX, mapY);
                     // 手数を記録
                     this.gameManagerScript.tapNum++;
+                    var a = this.gameManagerScript.initMap;
                 }
             }
         }

@@ -10,7 +10,7 @@ namespace PlayScene
         public FruitsMap fruitsMapScript;
         public PlayScene.UIManager uiManagerScript;
         public AudioManager audioManagerScript;
-        public int timeNum;
+        public float timeNum;
         public int tapNum;
         public int stageNum;
         public int squareNum;
@@ -31,7 +31,7 @@ namespace PlayScene
         // 初期処理
         private void Start () {
             // 初期化
-            this.timeNum = 0;
+            this.timeNum = 0.0f;
             this.tapNum = 0;
             this.isClearFlg = false;
             // ステージの各パラメーター設定
@@ -47,8 +47,8 @@ namespace PlayScene
                     this.audioManagerScript.playGameClearSE();
                     Invoke("showGameClearUI", 1.5f);
                 }else{
-                    this.timeNum = (int)Time.time;
-                    this.uiManagerScript.timeText.text = "タイム：" + this.timeNum.ToString().PadLeft(4);
+                    this.timeNum += Time.deltaTime;
+                    this.uiManagerScript.timeText.text = "タイム：" + this.timeNum.ToString("f0").PadLeft(4);
                     this.uiManagerScript.tapText.text = "タップ：" + this.tapNum.ToString().PadLeft(4);
                 }
             }
@@ -77,10 +77,6 @@ namespace PlayScene
             this.fruitsTypeList = gameCommonScript.getFrutisTypeList(stageNum);
             // 種類数取得
             this.fruitsTypeNum = gameCommonScript.getFruitsTypeNum(stageNum);
-            // 初期配置取得
-            this.initMap = gameCommonScript.getFruitsInitMap(stageNum);
-            // 完成配置所得
-            this.compMap = gameCommonScript.getFruitsCompMap(stageNum);
             // フルーツSprite取得
             this.fruitsSpriteList = gameCommonScript.fruitsSpriteList;
             // 方向条件取得

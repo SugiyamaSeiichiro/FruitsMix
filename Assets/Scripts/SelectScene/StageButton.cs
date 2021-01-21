@@ -26,6 +26,7 @@ namespace SelectScene
             {5, 25.0f},
         };
 
+        // ステージボタン設定
         public void setStageButton(int stageNum){
             this.gameCommonScript = GameObject.Find("GameCommon").GetComponent<GameCommon>();
             this.stageNum = stageNum;
@@ -44,21 +45,21 @@ namespace SelectScene
             this.createFruitsMapUI(compMap, this.fruitsCompMapParent);
         }
 
-        private List<float> getFruitsPosList(int typeNum){
+        private List<float> getFruitsPosList(int squareNum){
             List<float> fruitsPosList = new List<float>();
-            float distance = this.fruitsSizeList[typeNum] + 5.0f;
+            float distance = this.fruitsSizeList[squareNum] * 1.2f;
             float leftPos = 0;
             // 偶数配置
-            if(typeNum % 2 == 0){
-                int num = typeNum / 2;
+            if(squareNum % 2 == 0){
+                int num = squareNum / 2;
                 leftPos = -num * distance + distance/2;
             // 奇数配置
             }else{
-                int num = (typeNum - 1) / 2;
+                int num = (squareNum - 1) / 2;
                 leftPos = -num * distance;
             }
             // 位置格納
-            for(int i = 0; i < typeNum; i++){
+            for(int i = 0; i < squareNum; i++){
                 float pos = leftPos + (i * distance);
                 fruitsPosList.Add(pos);
             }
@@ -66,9 +67,9 @@ namespace SelectScene
         }
 
         private void createFruitsMapUI(int[,] map, GameObject parent){
-            int typeNum = this.gameCommonScript.getFruitsTypeNum(this.stageNum);
-            float size = this.fruitsSizeList[typeNum];
-            List<float> fruitsPosList = this.getFruitsPosList(typeNum);
+            int squareNum = this.gameCommonScript.getSquareNum(this.stageNum);
+            float size = this.fruitsSizeList[squareNum];
+            List<float> fruitsPosList = this.getFruitsPosList(squareNum);
             for(int i = 0; i < this.columnNum; i++){
                 for(int j = 0; j < this.rowNum; j++){
                     GameObject obj = Instantiate(this.fruitsImagePrefab);
@@ -89,7 +90,7 @@ namespace SelectScene
         private void GameSceneLoaded(Scene next, LoadSceneMode mode)
         {
             //シーン切り替え後のスクリプトを取得
-            var gameManager= GameObject.FindWithTag("GameManager").GetComponent<PlayScene.GameManager>();
+            var gameManager = GameObject.FindWithTag("GameManager").GetComponent<PlayScene.GameManager>();
             //データを渡す処理
             gameManager.stageNum = this.stageNum;
             //イベントから削除

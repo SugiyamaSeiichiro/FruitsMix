@@ -20,7 +20,6 @@ namespace SelectScene
                 obj.transform.SetParent(this.stageButtonParent.transform, false);
                 int stageNum = i + 1;
                 obj.GetComponent<StageButton>().setStageButton(stageNum);
-
             }
             
         }

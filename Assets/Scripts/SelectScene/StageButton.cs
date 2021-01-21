@@ -45,38 +45,19 @@ namespace SelectScene
             this.createFruitsMapUI(compMap, this.fruitsCompMapParent);
         }
 
-        private List<float> getFruitsPosList(int squareNum){
-            List<float> fruitsPosList = new List<float>();
-            float distance = this.fruitsSizeList[squareNum] * 1.2f;
-            float leftPos = 0;
-            // 偶数配置
-            if(squareNum % 2 == 0){
-                int num = squareNum / 2;
-                leftPos = -num * distance + distance/2;
-            // 奇数配置
-            }else{
-                int num = (squareNum - 1) / 2;
-                leftPos = -num * distance;
-            }
-            // 位置格納
-            for(int i = 0; i < squareNum; i++){
-                float pos = leftPos + (i * distance);
-                fruitsPosList.Add(pos);
-            }
-            return fruitsPosList;
-        }
-
         private void createFruitsMapUI(int[,] map, GameObject parent){
             int squareNum = this.gameCommonScript.getSquareNum(this.stageNum);
-            float size = this.fruitsSizeList[squareNum];
-            List<float> fruitsPosList = this.getFruitsPosList(squareNum);
+            // フルーツ配置箇所取得
+            GameCommon gameCommonScript = GameObject.Find("GameCommon").GetComponent<GameCommon>();
+            float fruitsSize = this.fruitsSizeList[squareNum];
+            List<float> fruitsPosList = gameCommonScript.getFruitsPosList(squareNum, fruitsSize);
             for(int i = 0; i < this.columnNum; i++){
                 for(int j = 0; j < this.rowNum; j++){
                     GameObject obj = Instantiate(this.fruitsImagePrefab);
                     obj.GetComponent<Image>().sprite = this.gameCommonScript.getFrutisSprite(map[i,j]);
                     obj.transform.SetParent(parent.transform, false);
                     RectTransform rectTransform = obj.GetComponent<RectTransform>();
-                    rectTransform.sizeDelta = new Vector2(size, size);
+                    rectTransform.sizeDelta = new Vector2(fruitsSize, fruitsSize);
                     rectTransform.anchoredPosition = new Vector2(fruitsPosList[j], -fruitsPosList[i]);
                 }
             }

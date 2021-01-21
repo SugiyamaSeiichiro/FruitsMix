@@ -28,16 +28,6 @@ namespace PlayScene
             {4, 1.8f},
             {5, 1.4f},
         };
-        private readonly Dictionary<int, float> fruitsIntervalList = new Dictionary<int, float>(){
-            {3, 3.0f},
-            {4, 2.2f},
-            {5, 1.7f},
-        };
-        private readonly Dictionary<int, Vector2> fruitsPositionList = new Dictionary<int, Vector2>(){
-            {3, new Vector2(-5.8f, 3.0f)},
-            {4, new Vector2(-6.1f, 3.3f)},
-            {5, new Vector2(-6.2f, 3.4f)},
-        };
 
         // Start is called before the first frame update
         void Start()
@@ -61,21 +51,19 @@ namespace PlayScene
             this.fruitsTypeNum = this.gameManagerScript.fruitsTypeNum;
             // フルーツオブジェクト配置
             this.fruitsObjectMap = new GameObject[this.columnNum, this.rowNum];
-
+            // フルーツ配置箇所取得
+            GameCommon gameCommonScript = GameObject.Find("GameCommon").GetComponent<GameCommon>();
+            float fruitsScale = this.fruitsScaleList[this.squareNum];
+            List<float> fruitsPosList = gameCommonScript.getFruitsPosList(squareNum, fruitsScale);
             // 左上から右に生成していく
             for(int i = 0; i < this.columnNum; i++){
                 for(int j = 0; j < this.rowNum; j++){
                     // フルーツ生成
-                    float x = j * this.fruitsIntervalList[this.squareNum];
-                    float y = i * this.fruitsIntervalList[this.squareNum];
-                    Vector3 position = new Vector3( x, -y, 0.0f);
-                    float scale = this.fruitsScaleList[this.squareNum];
-                    this.fruitsObjectMap[i,j] = this.getFruitsObject(this.initMap[i,j], position, scale, this.transform);
+                    Vector3 position = new Vector2(fruitsPosList[j], -fruitsPosList[i]);
+                    this.fruitsObjectMap[i,j] = this.getFruitsObject(this.initMap[i,j], position, fruitsScale, this.gameObject);
                     this.playMatchedBlink(j, i, false);
                 }
             }
-            // 全体のフルーツ位置を設定
-            this.gameObject.transform.position = this.fruitsPositionList[this.squareNum];
         }
 
         // Update is called once per frame
@@ -87,10 +75,15 @@ namespace PlayScene
                 RaycastHit2D hit = Physics2D.Raycast((Vector2)ray.origin, (Vector2)ray.direction);
                 if(hit){
                     audioManagerScript.playFruitsTapSE();
+                    float interval = this.fruitsScaleList[this.squareNum] * this.gameManagerScript.fruitsIntervalIndex;
                     float x = hit.collider.gameObject.transform.position.x;
                     float y = hit.collider.gameObject.transform.position.y;
-                    int mapX = (int)Mathf.Round((x - this.fruitsPositionList[this.squareNum].x)/this.fruitsIntervalList[this.squareNum]);
-                    int mapY = (int)Mathf.Round((-y + this.fruitsPositionList[this.squareNum].y)/this.fruitsIntervalList[this.squareNum]);
+                    Vector3 paretPos = this.gameObject.transform.position;
+                    float intervalNum = interval * (this.squareNum - 1) * 0.5f;
+                    float leftX = paretPos.x - intervalNum;
+                    float topY = paretPos.y + intervalNum;
+                    int mapX = (int)Mathf.Round((-leftX + x)/interval);
+                    int mapY = (int)Mathf.Round((topY -y)/interval);
                     int curType = this.curMap[mapY,mapX];
                     // 触れたフルーツを交換
                     this.changeNextFruits(mapX, mapY);
@@ -105,7 +98,7 @@ namespace PlayScene
         }
 
         // 他フルーツオブジェクト交換
-        void changeOtherFruitsObject(int curType, int mapX, int mapY){
+        private void changeOtherFruitsObject(int curType, int mapX, int mapY){
             List<(int,int)> hit = new List<(int,int)>();
             // 縦方向探索
             if(this.gameManagerScript.verticalFlg){
@@ -132,7 +125,7 @@ namespace PlayScene
         }
 
         // 次のフルーツ
-        void changeNextFruits(int x, int y){
+        private void changeNextFruits(int x, int y){
             int type = this.curMap[y,x];
             int nextType = this.getNextType(type);
             this.curMap[y,x] = nextType;
@@ -140,17 +133,18 @@ namespace PlayScene
         }
 
         // フルーツオブジェクト生成（初期生成）
-        GameObject getFruitsObject(int type, Vector3 position, float scale, Transform transform){
+        private GameObject getFruitsObject(int type, Vector3 position, float scale, GameObject parent){
             GameObject prefab = (GameObject)this.fruitsPrefab;
             GameObject obj = Instantiate (prefab, position, prefab.transform.rotation);
-            obj.GetComponent<SpriteRenderer>().sprite = this.gameManagerScript.fruitsSpriteList[type];
+            obj.transform.SetParent(parent.transform, false);
+            SpriteRenderer spriteRenderer = obj.GetComponent<SpriteRenderer>();
+            spriteRenderer.sprite = this.gameManagerScript.fruitsSpriteList[type];
             obj.transform.localScale = new Vector3(scale, scale, scale);
-            obj.transform.parent = transform;
             return obj;
         }
 
         // 次の種類取得
-        int getNextType(int curType)
+        private int getNextType(int curType)
         {
             if(curType < this.fruitsTypeList[this.fruitsTypeNum - 1]){
                 int nextNum = this.fruitsTypeList.IndexOf(curType) + 1;
@@ -161,7 +155,7 @@ namespace PlayScene
         }
 
         // 現在配置と完成図が一致している場合、点滅する
-        void playMatchedBlink(int x, int y, bool audioFlg){
+        private void playMatchedBlink(int x, int y, bool audioFlg){
             Blinker blinker = this.fruitsObjectMap[y,x].GetComponent<Blinker>();
             // 現在配置と完成図が一致している場合
             if(this.curMap[y,x] == this.compMap[y,x]){
@@ -184,7 +178,7 @@ namespace PlayScene
         }
 
         // 現在配置と完成配置が一致しているか
-        bool isCurMapAndCompMap()
+        private bool isCurMapAndCompMap()
         {
             for(int i = 0; i < this.rowNum; i++){
                 for(int j = 0; j < this.columnNum; j++){
@@ -197,7 +191,7 @@ namespace PlayScene
         }
 
         // 縦方向の探索
-        List<(int,int)> searchVertical(int x, int y)
+        private List<(int,int)> searchVertical(int x, int y)
         {
             List<(int,int)> hit = new List<(int,int)>();
             // 上の探索
@@ -235,7 +229,7 @@ namespace PlayScene
         }
 
         // 横方向の探索
-        List<(int,int)> searchHorizontal(int x, int y){
+        private List<(int,int)> searchHorizontal(int x, int y){
             List<(int,int)> hit = new List<(int,int)>();
             // 左の探索
             for(int i = 1; i < x + 1; i++){
@@ -271,7 +265,7 @@ namespace PlayScene
         }
 
         // 斜め方向の探索
-        List<(int,int)> searchDiagonal(int x, int y){
+        private List<(int,int)> searchDiagonal(int x, int y){
             List<(int,int)> hit = new List<(int,int)>();
             // 右斜め上の探索
             for (int i = 1; i < Math.Min(this.rowNum - x, y + 1); i++)

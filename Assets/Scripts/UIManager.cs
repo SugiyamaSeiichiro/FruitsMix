@@ -27,6 +27,7 @@ namespace PlayScene
             {4, new List<Vector2>(){new Vector2( 0.0f, 30.0f), new Vector2(30.0f, 30.0f), new Vector2(30.0f, 0.0f), new Vector2(0.0f, 0.0f)}},
             {5, new List<Vector2>(){new Vector2( 5.0f, 30.0f), new Vector2(30.0f, 30.0f), new Vector2(40.0f, 0.0f), new Vector2(20.0f, 0.0f), new Vector2(0.0f, 0.0f)}},
         };
+        private readonly float fruitsTypeOrderSize = 20.0f;
 
         // 初期処理
         private void Start()
@@ -37,16 +38,17 @@ namespace PlayScene
             // 種類順番UI
             foreach(var type in this.gameManagerScript.fruitsTypeList.Select((v, i) => new {Value = v, Index = i })){
                 Vector2 position = this.fruitsTypeOrderPositionList[this.gameManagerScript.fruitsTypeList.Count][type.Index];
-                float size = 20.0f;
-                this.createFruitsUI(position, size, type.Value, this.fruitsTypeOrderParent);
+                this.createFruitsUI(position, fruitsTypeOrderSize, type.Value, this.fruitsTypeOrderParent);
             }
-            List<float> fruitsPosList = this.getFruitsPosList(this.gameManagerScript.squareNum);
+            // フルーツ配置箇所取得
+            GameCommon gameCommonScript = GameObject.Find("GameCommon").GetComponent<GameCommon>();
+            float fruitsSize = this.fruitsSizeList[this.gameManagerScript.squareNum];
+            List<float> fruitsPosList = gameCommonScript.getFruitsPosList(this.gameManagerScript.squareNum, fruitsSize);
             // 完成配置UI
             for(int i = 0; i < this.gameManagerScript.columnNum; i++){
                 for(int j = 0; j < this.gameManagerScript.rowNum; j++){
-                    float size = this.fruitsSizeList[this.gameManagerScript.squareNum];
                     Vector2 position = new Vector2( fruitsPosList[j], -fruitsPosList[i]);
-                    this.createFruitsUI(position, size, this.gameManagerScript.compMap[i,j], this.frutisCompMapParent);
+                    this.createFruitsUI(position, fruitsSize, this.gameManagerScript.compMap[i,j], this.frutisCompMapParent);
                 }
             }
         }
@@ -65,27 +67,6 @@ namespace PlayScene
             if(!this.gameManagerScript.diagonalFlg){
                 this.directionTextList[2].SetActive(false);
             }
-        }
-
-        private List<float> getFruitsPosList(int squareNum){
-            List<float> fruitsPosList = new List<float>();
-            float distance = this.fruitsSizeList[squareNum] * 1.2f;
-            float leftPos = 0;
-            // 偶数配置
-            if(squareNum % 2 == 0){
-                int num = squareNum / 2;
-                leftPos = -num * distance + distance/2;
-            // 奇数配置
-            }else{
-                int num = (squareNum - 1) / 2;
-                leftPos = -num * distance;
-            }
-            // 位置格納
-            for(int i = 0; i < squareNum; i++){
-                float pos = leftPos + (i * distance);
-                fruitsPosList.Add(pos);
-            }
-            return fruitsPosList;
         }
 
         // フルーツUI取得

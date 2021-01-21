@@ -8,6 +8,7 @@ public class GameCommon : MonoBehaviour
 {
     public int stageAllNum;
     public List<Sprite> fruitsSpriteList;
+    public readonly float fruitsIntervalIndex = 1.2f;
 
     private List<List<int>> fruitsTypeList = new List<List<int>>();
     private List<(int[,], int[,])> fruitsMapList = new List<(int[,], int[,])>();
@@ -91,6 +92,28 @@ public class GameCommon : MonoBehaviour
             directionConditionList = new Dictionary<string, bool>(){{"vertical", true}, {"horizontal", true}, {"diagonal", true}};
         }
         return directionConditionList;
+    }
+
+    // フルーツ配置箇所取得
+    public List<float> getFruitsPosList(int squareNum, float size){
+        List<float> fruitsPosList = new List<float>();
+        float distance = size * this.fruitsIntervalIndex;
+        float leftPos = 0;
+        // 偶数配置
+        if(squareNum % 2 == 0){
+            int num = squareNum / 2;
+            leftPos = -num * distance + distance/2;
+        // 奇数配置
+        }else{
+            int num = (squareNum - 1) / 2;
+            leftPos = -num * distance;
+        }
+        // 位置格納
+        for(int i = 0; i < squareNum; i++){
+            float pos = leftPos + (i * distance);
+            fruitsPosList.Add(pos);
+        }
+        return fruitsPosList;
     }
 
     // 全ステージ数取得

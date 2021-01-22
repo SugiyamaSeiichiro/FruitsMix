@@ -17,6 +17,7 @@ namespace PlayScene
         public GameObject frutisCompMapPrefab;
         public GameObject frutisCompMapParent;
         public GameObject gameClearUI;
+        public GameObject nextButton;
         private readonly Dictionary<int, float> fruitsSizeList = new Dictionary<int, float>(){
             {3, 55.0f},
             {4, 40.0f},
@@ -34,15 +35,14 @@ namespace PlayScene
         {
             // 方向条件テキスト設定
             this.setDirectionConditionText();
-            
             // 種類順番UI
             foreach(var type in this.gameManagerScript.fruitsTypeList.Select((v, i) => new {Value = v, Index = i })){
                 Vector2 position = this.fruitsTypeOrderPositionList[this.gameManagerScript.fruitsTypeList.Count][type.Index];
                 this.createFruitsUI(position, fruitsTypeOrderSize, type.Value, this.fruitsTypeOrderParent);
             }
             // フルーツ配置箇所取得
-            GameCommon gameCommonScript = GameObject.Find("GameCommon").GetComponent<GameCommon>();
             float fruitsSize = this.fruitsSizeList[this.gameManagerScript.squareNum];
+            GameCommon gameCommonScript = GameObject.Find("GameCommon").GetComponent<GameCommon>();
             List<float> fruitsPosList = gameCommonScript.getFruitsPosList(this.gameManagerScript.squareNum, fruitsSize);
             // 完成配置UI
             for(int i = 0; i < this.gameManagerScript.columnNum; i++){
@@ -83,11 +83,32 @@ namespace PlayScene
         // ゲームクリアUI表示
         public void showGameClearUI(){
             this.gameClearUI.SetActive(true);
+            GameCommon gameCommonScript = GameObject.Find("GameCommon").GetComponent<GameCommon>();
+            int stageAllNum = gameCommonScript.getStageAllNum();
+            if(this.gameManagerScript.stageNum >= stageAllNum){
+                this.nextButton.SetActive(false);
+            }
         }
 
         // セレクトシーン遷移
         public void onClickToSelectScene(){
             SceneManager.LoadScene("SelectScene");
+        }
+
+        // 次のステージ遷移
+        public void onClickToNextStageScene(){
+            SceneManager.sceneLoaded += GameSceneLoaded;
+            SceneManager.LoadScene("MainScene");
+        }
+
+        private void GameSceneLoaded(Scene next, LoadSceneMode mode)
+        {
+            //シーン切り替え後のスクリプトを取得
+            var gameManager = GameObject.FindWithTag("GameManager").GetComponent<PlayScene.GameManager>();
+            //データを渡す処理
+            gameManager.stageNum = this.gameManagerScript.stageNum + 1;
+            //イベントから削除
+            SceneManager.sceneLoaded -= GameSceneLoaded;
         }
     }
 }

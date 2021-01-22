@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class GameCommon : MonoBehaviour
 {
-    public int stageAllNum;
+    public int stageAllNum = 0;
     public List<Sprite> fruitsSpriteList;
     public readonly float fruitsIntervalIndex = 1.2f;
 
@@ -26,8 +26,8 @@ public class GameCommon : MonoBehaviour
     void Start(){
         DontDestroyOnLoad(this);
         this.fruitsTypeList.Add(new List<int>());
-        this.stageAllNum = this.getStageAllNum();
-        for(int i = 0; i < this.stageAllNum; i++){
+        int stageAllNum = this.getStageAllNum();
+        for(int i = 0; i < stageAllNum; i++){
             this.fruitsMapList.Add(this.getFruitsMaps(i + 1));
             this.fruitsTypeList[i].Sort();
         }
@@ -117,11 +117,14 @@ public class GameCommon : MonoBehaviour
     }
 
     // 全ステージ数取得
-    private int getStageAllNum(){
-        string path = Application.dataPath + "/Resources/Conf/";
-        string[] initMapFiles = Directory.GetFiles(path + this.initMapPath, "*.txt", SearchOption.AllDirectories);
-        string[] compMapFiles = Directory.GetFiles(path + this.compMapPath, "*.txt", SearchOption.AllDirectories);
-        return Mathf.Min(initMapFiles.Length, compMapFiles.Length);
+    public int getStageAllNum(){
+        if(this.stageAllNum == 0){
+            string path = Application.dataPath + "/Resources/Conf/";
+            string[] initMapFiles = Directory.GetFiles(path + this.initMapPath, "*.txt", SearchOption.AllDirectories);
+            string[] compMapFiles = Directory.GetFiles(path + this.compMapPath, "*.txt", SearchOption.AllDirectories);
+            this.stageAllNum = Mathf.Min(initMapFiles.Length, compMapFiles.Length);
+        }
+        return this.stageAllNum;
     }
 
     // フルーツ初期、完成配置取得

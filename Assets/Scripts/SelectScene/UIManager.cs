@@ -21,7 +21,6 @@ namespace SelectScene
                 int stageNum = i + 1;
                 obj.GetComponent<StageButton>().setStageButton(stageNum);
             }
-            
         }
 
         // Update is called once per frame

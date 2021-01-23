@@ -13,11 +13,14 @@ namespace PlayScene
         public Text timeText;
         public Text tapText;
         public List<GameObject> directionTextList;
+        public GameObject frutisImagePrefab;
+        public GameObject nextFruitsUIPrefab;
         public GameObject fruitsTypeOrderParent;
-        public GameObject frutisCompMapPrefab;
         public GameObject frutisCompMapParent;
         public GameObject gameClearUI;
         public GameObject nextButton;
+
+        private List<GameObject> nextFruitsUIList = new List<GameObject>();
         private readonly Dictionary<int, float> fruitsSizeList = new Dictionary<int, float>(){
             {3, 55.0f},
             {4, 40.0f},
@@ -36,9 +39,11 @@ namespace PlayScene
             // 方向条件テキスト設定
             this.setDirectionConditionText();
             // 種類順番UI
-            foreach(var type in this.gameManagerScript.fruitsTypeList.Select((v, i) => new {Value = v, Index = i })){
-                Vector2 position = this.fruitsTypeOrderPositionList[this.gameManagerScript.fruitsTypeList.Count][type.Index];
-                this.createFruitsUI(position, fruitsTypeOrderSize, type.Value, this.fruitsTypeOrderParent);
+            foreach(var value in this.gameManagerScript.fruitsTypeList.Select((v, i) => new {Value = v, Index = i })){
+                Vector2 position = this.fruitsTypeOrderPositionList[this.gameManagerScript.fruitsTypeList.Count][value.Index];
+                int type = value.Value;
+                GameObject parent = this.fruitsTypeOrderParent;
+                this.createFruitsUI(type, fruitsTypeOrderSize, position, parent);
             }
             // フルーツ配置箇所取得
             float fruitsSize = this.fruitsSizeList[this.gameManagerScript.squareNum];
@@ -48,7 +53,9 @@ namespace PlayScene
             for(int i = 0; i < this.gameManagerScript.columnNum; i++){
                 for(int j = 0; j < this.gameManagerScript.rowNum; j++){
                     Vector2 position = new Vector2( fruitsPosList[j], -fruitsPosList[i]);
-                    this.createFruitsUI(position, fruitsSize, this.gameManagerScript.compMap[i,j], this.frutisCompMapParent);
+                    int type = this.gameManagerScript.compMap[i,j];
+                    GameObject parent = this.frutisCompMapParent;
+                    this.createFruitsUI(type, fruitsSize, position, parent);
                 }
             }
         }
@@ -70,9 +77,8 @@ namespace PlayScene
         }
 
         // フルーツUI取得
-        private void createFruitsUI(Vector2 position, float size, int type, GameObject parent){
-            GameObject prefab = (GameObject)frutisCompMapPrefab;
-            GameObject obj = Instantiate(prefab);
+        private void createFruitsUI(int type, float size, Vector2 position, GameObject parent){
+            GameObject obj = Instantiate(frutisImagePrefab);
             obj.GetComponent<Image>().sprite = this.gameManagerScript.fruitsSpriteList[type];
             obj.transform.SetParent(parent.transform, false);
             RectTransform rectTransform = obj.GetComponent<RectTransform>();
@@ -88,6 +94,30 @@ namespace PlayScene
             if(this.gameManagerScript.stageNum >= stageAllNum){
                 this.nextButton.SetActive(false);
             }
+        }
+
+        // 次フルーツUI作成
+        public void createNextFruitsUI(int type, float size, Vector2 position){
+            // スクリーン座標取得
+            Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(Camera.main, position);
+            // 次フルーツUI作成
+            GameObject obj = Instantiate(nextFruitsUIPrefab);
+            obj.GetComponent<Image>().sprite = this.gameManagerScript.fruitsSpriteList[type];
+            obj.transform.SetParent(this.gameObject.transform, false);
+            RectTransform rectTransform = obj.GetComponent<RectTransform>();
+            rectTransform.sizeDelta = new Vector2(size, size);
+            obj.transform.position = screenPos;
+            // 作成したオブジェクトの記録
+            this.nextFruitsUIList.Add(obj);
+        }
+
+        // 次フルーツUI削除
+        public void deleteNextFruitsUI(){
+            foreach(var value in this.nextFruitsUIList)
+            {
+                Destroy(value);
+            }
+            this.nextFruitsUIList.Clear();
         }
 
         // セレクトシーン遷移

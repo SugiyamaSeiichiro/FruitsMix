@@ -22,6 +22,9 @@ namespace PlayScene
         private GameObject[,] fruitsObjectMap;
         private List<int> fruitsTypeList = new List<int>();
         private int fruitsTypeNum;
+        private float fruitsScale;
+        private GameObject touchFruitsObject;
+        private List<(int,int)> changeOtherFruitsObjectList;
 
         private readonly Dictionary<int, float> fruitsScaleList = new Dictionary<int, float>(){
             {3, 2.4f},
@@ -51,10 +54,11 @@ namespace PlayScene
             this.fruitsTypeNum = this.gameManagerScript.fruitsTypeNum;
             // フルーツオブジェクト配置
             this.fruitsObjectMap = new GameObject[this.columnNum, this.rowNum];
+            // フルーツサイズ取得
+            this.fruitsScale = this.fruitsScaleList[this.squareNum];
             // フルーツ配置箇所取得
             GameCommon gameCommonScript = GameObject.Find("GameCommon").GetComponent<GameCommon>();
-            float fruitsScale = this.fruitsScaleList[this.squareNum];
-            List<float> fruitsPosList = gameCommonScript.getFruitsPosList(squareNum, fruitsScale);
+            List<float> fruitsPosList = gameCommonScript.getFruitsPosList(this.squareNum, fruitsScale);
             // 左上から右に生成していく
             for(int i = 0; i < this.columnNum; i++){
                 for(int j = 0; j < this.rowNum; j++){
@@ -69,49 +73,94 @@ namespace PlayScene
         // Update is called once per frame
         void Update()
         {
-            if(Input.GetMouseButtonDown(0) && !this.gameManagerScript.isClearFlg){
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                //Rayとオブジェクトの接触を調べる
-                RaycastHit2D hit = Physics2D.Raycast((Vector2)ray.origin, (Vector2)ray.direction);
-                if(hit){
-                    audioManagerScript.playFruitsTapSE();
-                    float interval = this.fruitsScaleList[this.squareNum] * this.gameManagerScript.fruitsIntervalIndex;
-                    float x = hit.collider.gameObject.transform.position.x;
-                    float y = hit.collider.gameObject.transform.position.y;
-                    Vector3 paretPos = this.gameObject.transform.position;
-                    float intervalNum = interval * (this.squareNum - 1) * 0.5f;
-                    float leftX = paretPos.x - intervalNum;
-                    float topY = paretPos.y + intervalNum;
-                    int mapX = (int)Mathf.Round((-leftX + x)/interval);
-                    int mapY = (int)Mathf.Round((topY -y)/interval);
-                    int curType = this.curMap[mapY,mapX];
-                    // 触れたフルーツを交換
-                    this.changeNextFruits(mapX, mapY);
-                    this.playMatchedBlink(mapX, mapY, true);
-                    // 他フルーツの交換
-                    this.changeOtherFruitsObject(curType, mapX, mapY);
-                    // 手数を記録
-                    this.gameManagerScript.tapNum++;
-                    var a = this.gameManagerScript.initMap;
-                }
+            if(this.gameManagerScript.isClearFlg){
+                return;
+            }
+            if(Input.GetMouseButtonDown(0)){
+                this.touchBegan();
+            }else if(Input.GetMouseButtonUp(0)){
+                this.touchEnded();
             }
         }
 
+        // タッチ開始処理
+        private void touchBegan(){
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            // Rayとオブジェクトの接触を調べる
+            RaycastHit2D hit = Physics2D.Raycast((Vector2)ray.origin, (Vector2)ray.direction);
+            if(!hit){
+                return;
+            }
+            this.touchFruitsObject = hit.collider.gameObject;
+            // マップ座標計算
+            float x = hit.collider.gameObject.transform.position.x;
+            float y = hit.collider.gameObject.transform.position.y;
+            int mapX = 0;
+            int mapY = 0;
+            this.setTouchPosToFruitsMapPos(x, y, ref mapX, ref mapY);
+            // 他の交換されるフルーツ取得
+            int type = this.curMap[mapY,mapX];
+            int nextType = this.getNextType(type);
+            this.changeOtherFruitsObjectList = this.getChangeOtherFruitsObjectList(mapX, mapY, nextType);
+            // 交換されるフルーツのUI表示
+            List<(int, int)> changeFruitsList = new List<(int,int)>();
+            changeFruitsList.AddRange(this.changeOtherFruitsObjectList);
+            changeFruitsList.Add((mapX,mapY));
+            this.showNextFruitsUI(changeFruitsList);
+        }
+
+        // タッチ終了処理
+        private void touchEnded(){
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            // Rayとオブジェクトの接触を調べる
+            RaycastHit2D hit = Physics2D.Raycast((Vector2)ray.origin, (Vector2)ray.direction);
+            // 次フルーツUI削除
+            this.gameManagerScript.uiManagerScript.deleteNextFruitsUI();
+            // タッチ開始時とタッチ終了時が違うオブジェクトの場合
+            if(!hit || (hit && this.touchFruitsObject != hit.collider.gameObject)){
+                return;
+            }
+            // フルーツタップSE
+            this.audioManagerScript.playFruitsTapSE();
+            // マップ座標計算
+            float x = hit.collider.gameObject.transform.position.x;
+            float y = hit.collider.gameObject.transform.position.y;
+            int mapX = 0;
+            int mapY = 0;
+            this.setTouchPosToFruitsMapPos(x, y, ref mapX, ref mapY);
+            // 触れたフルーツを交換
+            this.changeNextFruits(mapX, mapY);
+            this.playMatchedBlink(mapX, mapY, true);
+            // 他フルーツの交換
+            this.changeOtherFruitsObject(this.changeOtherFruitsObjectList);
+            // 手数を記録
+            this.gameManagerScript.tapNum++;
+        }
+
+        // 次フルーツUI表示処理
+        private void showNextFruitsUI(List<(int,int)> changeFruitsList){
+            foreach((int x,int y) value in changeFruitsList){
+                int type = this.curMap[value.y, value.x];
+                int nextType = this.getNextType(type);
+                float size = fruitsScale * 30.0f;
+                Vector2 position = this.fruitsObjectMap[value.y, value.x].transform.position;
+                this.gameManagerScript.uiManagerScript.createNextFruitsUI(nextType, size, position);
+            }
+        }
+
+        // タッチしたフルーツのマップ座標を取得
+        private void setTouchPosToFruitsMapPos(float touchX, float touchY, ref int mapX, ref int mapY){
+            Vector3 paretPos = this.gameObject.transform.position;
+            float interval = this.fruitsScale * this.gameManagerScript.fruitsIntervalIndex;
+            float intervalNum = interval * (this.squareNum - 1) * 0.5f;
+            float leftX = paretPos.x - intervalNum;
+            float topY = paretPos.y + intervalNum;
+            mapX = (int)Mathf.Round((-leftX + touchX)/interval);
+            mapY = (int)Mathf.Round((topY - touchY)/interval);
+        }
+
         // 他フルーツオブジェクト交換
-        private void changeOtherFruitsObject(int curType, int mapX, int mapY){
-            List<(int,int)> hit = new List<(int,int)>();
-            // 縦方向探索
-            if(this.gameManagerScript.verticalFlg){
-                hit.AddRange(this.searchVertical(mapX, mapY));
-            }
-            // 横方向探索
-            if(this.gameManagerScript.horizontalFlg){
-                hit.AddRange(this.searchHorizontal(mapX, mapY));
-            }
-            // 斜め方向探索
-            if(this.gameManagerScript.diagonalFlg){
-                hit.AddRange(this.searchDiagonal(mapX, mapY));
-            }
+        private void changeOtherFruitsObject(List<(int,int)> hit){
             // hitしたフルーツを交換
             foreach((int x,int y) value in hit){
                 this.changeNextFruits(value.x, value.y);
@@ -124,12 +173,40 @@ namespace PlayScene
             }
         }
 
+        // 他フルーツオブジェクト取得
+        private List<(int,int)> getChangeOtherFruitsObjectList(int mapX, int mapY, int type){
+            List<(int,int)> hit = new List<(int,int)>();
+            // 縦方向探索
+            if(this.gameManagerScript.verticalFlg){
+                hit.AddRange(this.searchVertical(mapX, mapY, type));
+            }
+            // 横方向探索
+            if(this.gameManagerScript.horizontalFlg){
+                hit.AddRange(this.searchHorizontal(mapX, mapY, type));
+            }
+            // 斜め方向探索
+            if(this.gameManagerScript.diagonalFlg){
+                hit.AddRange(this.searchDiagonal(mapX, mapY, type));
+            }
+            return hit;
+        }
+
         // 次のフルーツ
         private void changeNextFruits(int x, int y){
             int type = this.curMap[y,x];
             int nextType = this.getNextType(type);
             this.curMap[y,x] = nextType;
-            this.fruitsObjectMap[y,x].GetComponent<SpriteRenderer>().sprite = this.gameManagerScript.fruitsSpriteList[nextType];
+            GameObject gameObject = this.fruitsObjectMap[y,x];
+            gameObject.GetComponent<SpriteRenderer>().sprite = this.gameManagerScript.fruitsSpriteList[nextType];
+            // アニメーション
+            iTween.Stop(gameObject);
+            gameObject.transform.localScale = new Vector2(this.fruitsScale, this.fruitsScale);
+            iTween.PunchScale(gameObject, iTween.Hash(
+                "x", this.fruitsScale * 1.2f,
+                "y", this.fruitsScale * 1.2f,
+                "delay", 0.1f,
+                "time", 2.0f)
+            );
         }
 
         // フルーツオブジェクト生成（初期生成）
@@ -191,14 +268,14 @@ namespace PlayScene
         }
 
         // 縦方向の探索
-        private List<(int,int)> searchVertical(int x, int y)
+        private List<(int,int)> searchVertical(int x, int y, int type)
         {
             List<(int,int)> hit = new List<(int,int)>();
             // 上の探索
             for(int i = 1; i < y + 1; i++){
                 int nextY = y - i;
                 // 同じ種類があった場合
-                if(this.curMap[y,x] == this.curMap[nextY,x]){
+                if(type == this.curMap[nextY,x]){
                     // 隣の場合、何もせずに終了
                     if(i != 1){
                         // 二つ以上離れている場合、間の種類変える
@@ -213,7 +290,7 @@ namespace PlayScene
             for(int i = 1; i < (this.columnNum - y); i++){
                 int nextY = y + i;
                 // 同じ種類があった場合
-                if(this.curMap[y,x] == this.curMap[nextY,x]){
+                if(type == this.curMap[nextY,x]){
                     // 隣の場合、何もせずに終了
                     if(i != 1){
                         //changeNum += i - 1;
@@ -229,13 +306,13 @@ namespace PlayScene
         }
 
         // 横方向の探索
-        private List<(int,int)> searchHorizontal(int x, int y){
+        private List<(int,int)> searchHorizontal(int x, int y, int type){
             List<(int,int)> hit = new List<(int,int)>();
             // 左の探索
             for(int i = 1; i < x + 1; i++){
                 int nextX = x - i;
                 // 同じ種類があった場合
-                if(this.curMap[y,x] == this.curMap[y,nextX]){
+                if(type == this.curMap[y,nextX]){
                     // 隣の場合、何もせずに終了
                     if(i != 1){
                         // 二つ以上離れている場合、間の種類変える
@@ -250,7 +327,7 @@ namespace PlayScene
             for(int i = 1; i < (this.rowNum - x); i++){
                 int nextX = x + i;
                 // 同じ種類があった場合
-                if(this.curMap[y,x] == this.curMap[y,nextX]){
+                if(type == this.curMap[y,nextX]){
                     // 隣の場合、何もせずに終了
                     if(i != 1){
                         // 二つ以上離れている場合、間の種類変える
@@ -265,7 +342,7 @@ namespace PlayScene
         }
 
         // 斜め方向の探索
-        private List<(int,int)> searchDiagonal(int x, int y){
+        private List<(int,int)> searchDiagonal(int x, int y, int type){
             List<(int,int)> hit = new List<(int,int)>();
             // 右斜め上の探索
             for (int i = 1; i < Math.Min(this.rowNum - x, y + 1); i++)
@@ -273,7 +350,7 @@ namespace PlayScene
                 int nextX = x + i;
                 int nextY = y - i;
                 // 同じ種類があった場合
-                if(this.curMap[y,x] == this.curMap[nextY,nextX]){
+                if(type == this.curMap[nextY,nextX]){
                     // 隣の場合、何もせずに終了
                     if(i != 1){
                         // 二つ以上離れている場合、間の種類変える
@@ -290,7 +367,7 @@ namespace PlayScene
                 int nextX = x + i;
                 int nextY = y + i;
                 // 同じ種類があった場合
-                if(this.curMap[y,x] == this.curMap[nextY,nextX]){
+                if(type == this.curMap[nextY,nextX]){
                     // 隣の場合、何もせずに終了
                     if(i != 1){
                         // 二つ以上離れている場合、間の種類変える
@@ -307,7 +384,7 @@ namespace PlayScene
                 int nextX = x - i;
                 int nextY = y - i;
                 // 同じ種類があった場合
-                if(this.curMap[y,x] == this.curMap[nextY,nextX]){
+                if(type == this.curMap[nextY,nextX]){
                     // 隣の場合、何もせずに終了
                     if(i != 1){
                         // 二つ以上離れている場合、間の種類変える
@@ -324,7 +401,7 @@ namespace PlayScene
                 int nextX = x - i;
                 int nextY = y + i;
                 // 同じ種類があった場合
-                if(this.curMap[y,x] == this.curMap[nextY,nextX]){
+                if(type == this.curMap[nextY,nextX]){
                     // 隣の場合、何もせずに終了
                     if(i != 1){
                         // 二つ以上離れている場合、間の種類変える

@@ -547,8 +547,9 @@ MonoBehaviour:
   - {fileID: 1700998085}
   - {fileID: 531374144}
   - {fileID: 158346843}
+  frutisImagePrefab: {fileID: 3430039660402517073, guid: 16cf2f6c7cd524270aa57a5d34995055, type: 3}
+  nextFruitsUIPrefab: {fileID: 8894115393332482199, guid: cc4ad5184f2814fa382d8c9a5a1db971, type: 3}
   fruitsTypeOrderParent: {fileID: 531634710}
-  frutisCompMapPrefab: {fileID: 3430039660402517073, guid: 16cf2f6c7cd524270aa57a5d34995055, type: 3}
   frutisCompMapParent: {fileID: 1921967683}
   gameClearUI: {fileID: 1486874907}
   nextButton: {fileID: 851546941}

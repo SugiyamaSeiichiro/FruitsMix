@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Common;
 
 namespace SelectScene
 {
@@ -16,6 +17,8 @@ namespace SelectScene
         public GameObject fruitsImagePrefab;
         public GameObject fruitsInitMapParent;
         public GameObject fruitsCompMapParent;
+        public GameObject starImagesParent;
+        public Sprite grayStarSprite;
         private int rowNum;
         private int columnNum;
         private int stageNum;
@@ -38,6 +41,19 @@ namespace SelectScene
             int typeNum = this.gameCommonScript.getFruitsTypeNum(stageNum);
             this.typeNumText.text = typeNum.ToString() + "種類";
             startButton.onClick.AddListener(() => onClickToMainScene());
+            // 星UI作成
+            string key = "stage" + this.stageNum.ToString();
+            StageInfo stageInfo = PlayerPrefsUtils.GetObject<StageInfo>(key);
+            // クリアしている場合、外郭の色を変える
+            if(stageInfo != null){
+                this.gameObject.GetComponent<Outline>().effectColor = Color.yellow;
+            }
+            for(int i = 0; i < this.starImagesParent.transform.childCount; i++){
+                GameObject obj = this.starImagesParent.transform.GetChild(i).gameObject;
+                if(stageInfo == null || !stageInfo.clearList[i]){
+                    obj.GetComponent<Image>().sprite = this.grayStarSprite;
+                }
+            }
             // フルーツUI作成
             int[,] initMap = this.gameCommonScript.getFruitsInitMap(stageNum);
             int[,] compMap = this.gameCommonScript.getFruitsCompMap(stageNum);

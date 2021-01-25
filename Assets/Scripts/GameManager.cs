@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Common;
 
 namespace PlayScene
 {
@@ -47,12 +48,48 @@ namespace PlayScene
                     this.fruitsMapScript.playAllMatchedBlink();
                     this.audioManagerScript.playGameClearSE();
                     Invoke("showGameClearUI", 1.5f);
+                    this.saveData();
                 }else{
                     this.timeNum += Time.deltaTime;
                     this.uiManagerScript.timeText.text = "タイム：" + this.timeNum.ToString("f0").PadLeft(4);
                     this.uiManagerScript.tapText.text = "タップ：" + this.tapNum.ToString().PadLeft(4);
                 }
             }
+        }
+
+        private void saveData(){
+            StageInfo stageInfo = new StageInfo();
+            // 記録するKey作成
+            string key = "stage" + this.stageNum.ToString();
+            // 前回の情報取得
+            StageInfo beforeStageInfo = PlayerPrefsUtils.GetObject<StageInfo>(key);
+            // 前回の情報がある場合
+            if(beforeStageInfo != null){
+                // 時間
+                stageInfo.timeNum = (this.timeNum < beforeStageInfo.timeNum) ? this.timeNum : beforeStageInfo.timeNum;
+                // タップ数
+                stageInfo.tapNum = (this.tapNum < beforeStageInfo.tapNum) ? this.tapNum : beforeStageInfo.tapNum;
+                // 指定時間以内のクリア判定
+                stageInfo.clearList[0] = (!beforeStageInfo.clearList[0]) ? this.timeNum < 20.0f : beforeStageInfo.clearList[0];
+                // 指定タップ数以内のクリア判定
+                stageInfo.clearList[1] = (!beforeStageInfo.clearList[1]) ? this.tapNum < 20 : beforeStageInfo.clearList[1];
+                // 時間とタップ数が両方指定数以内のクリア判定
+                stageInfo.clearList[2] = (!beforeStageInfo.clearList[2]) ? this.timeNum < 20.0f && this.tapNum < 20 : beforeStageInfo.clearList[2];
+            // 新規情報追加の場合
+            }else{
+                // 時間
+                stageInfo.timeNum = this.timeNum;
+                // タップ数
+                stageInfo.tapNum = this.tapNum;
+                // 指定時間以内のクリア判定
+                stageInfo.clearList[0] = this.timeNum < 5.0f;
+                // 指定タップ数以内のクリア判定
+                stageInfo.clearList[1] = this.tapNum < 5;
+                // 時間とタップ数が両方指定数以内のクリア判定
+                stageInfo.clearList[2] = this.timeNum < 5.0f && this.tapNum < 5;
+            }
+            // データを保存する
+            PlayerPrefsUtils.SetObject(key, stageInfo);
         }
 
         // ゲームクリアUI表示

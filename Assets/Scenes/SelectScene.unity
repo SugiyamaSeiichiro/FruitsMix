@@ -432,7 +432,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5df8590cb84674d86975cc2bd6fdd56e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameCommonScript: {fileID: 0}
   stageButtonPrefab: {fileID: 1494247237598090994, guid: 46425ddfea7df4fca9172f9b2286d43d, type: 3}
   stageButtonParent: {fileID: 1089552198}
 --- !u!1 &1030080414

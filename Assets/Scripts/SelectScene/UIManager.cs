@@ -10,7 +10,6 @@ namespace SelectScene
     {
         public GameObject stageButtonPrefab;
         public GameObject stageButtonParent;
-        private int stageNum;
         // Start is called before the first frame update
         void Start()
         {
@@ -20,14 +19,8 @@ namespace SelectScene
                 GameObject obj = Instantiate(this.stageButtonPrefab);
                 obj.transform.SetParent(this.stageButtonParent.transform, false);
                 int stageNum = i + 1;
-                obj.GetComponent<StageButton>().setStageButton(stageNum);
+                obj.GetComponent<StageButton>().setStageButtonInfo(stageNum);
             }
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-            
         }
     }
 }

@@ -88,12 +88,11 @@ namespace PlayScene
 
         // ゲームクリアUI表示
         public void showGameClearUI(){
-            this.gameClearUI.SetActive(true);
-            GameCommon gameCommonScript = GameObject.Find("GameCommon").GetComponent<GameCommon>();
-            int stageAllNum = gameCommonScript.getStageAllNum();
-            if(this.gameManagerScript.stageNum >= stageAllNum){
-                this.nextButton.SetActive(false);
-            }
+            this.gameClearUI.GetComponent<GameClear>().Show(
+                this.gameManagerScript.stageNum,
+                this.gameManagerScript.timeNum,
+                this.gameManagerScript.tapNum
+            );
         }
 
         // 次フルーツUI作成
@@ -118,27 +117,6 @@ namespace PlayScene
                 Destroy(value);
             }
             this.nextFruitsUIList.Clear();
-        }
-
-        // セレクトシーン遷移
-        public void onClickToSelectScene(){
-            SceneManager.LoadScene("SelectScene");
-        }
-
-        // 次のステージ遷移
-        public void onClickToNextStageScene(){
-            SceneManager.sceneLoaded += GameSceneLoaded;
-            SceneManager.LoadScene("MainScene");
-        }
-
-        private void GameSceneLoaded(Scene next, LoadSceneMode mode)
-        {
-            //シーン切り替え後のスクリプトを取得
-            var gameManager = GameObject.FindWithTag("GameManager").GetComponent<PlayScene.GameManager>();
-            //データを渡す処理
-            gameManager.stageNum = this.gameManagerScript.stageNum + 1;
-            //イベントから削除
-            SceneManager.sceneLoaded -= GameSceneLoaded;
         }
     }
 }

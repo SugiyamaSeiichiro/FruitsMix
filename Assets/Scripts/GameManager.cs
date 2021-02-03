@@ -48,11 +48,9 @@ namespace PlayScene
                     this.fruitsMapScript.playAllMatchedBlink();
                     this.audioManagerScript.playGameClearSE();
                     Invoke("showGameClearUI", 1.5f);
-                    this.saveData();
                 }else{
                     this.timeNum += Time.deltaTime;
                     this.uiManagerScript.timeText.text = "タイム：" + this.timeNum.ToString("f0").PadLeft(4);
-                    this.uiManagerScript.tapText.text = "タップ：" + this.tapNum.ToString().PadLeft(4);
                 }
             }
         }

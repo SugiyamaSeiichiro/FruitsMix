@@ -3,14 +3,17 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Common;
 
+// ステージ情報
 public class GameCommon : MonoBehaviour
 {
-    public int stageAllNum = 0;
     public List<Sprite> fruitsSpriteList;
-    public readonly float fruitsIntervalIndex = 1.2f;
 
-    private List<List<int>> fruitsTypeList = new List<List<int>>();
+    private int stageAllNum = 0;
+    private TextAsset[] initMapFiles;
+    private TextAsset[] compMapFiles;
+    private List<List<int>> fruitsTypeLists = new List<List<int>>();
     private List<(int[,], int[,])> fruitsMapList = new List<(int[,], int[,])>();
     private List<int> rowNumList = new List<int>();
     private List<int> columnNumList = new List<int>();
@@ -20,16 +23,14 @@ public class GameCommon : MonoBehaviour
         {3, new Dictionary<string, bool>(){{"vertical", true}, {"horizontal", true}, {"diagonal", true}}},
     };
 
-    private readonly string initMapPath = "InitMap";
-    private readonly string compMapPath = "CompMap";
-
     void Start(){
         DontDestroyOnLoad(this);
-        this.fruitsTypeList.Add(new List<int>());
+        // 全ステージ情報取得
         int stageAllNum = this.getStageAllNum();
         for(int i = 0; i < stageAllNum; i++){
-            this.fruitsMapList.Add(this.getFruitsMaps(i + 1));
-            this.fruitsTypeList[i].Sort();
+            int stageNum = i + 1;
+            (int[,], int[,]) fruitsMap = this.getFruitsMaps(stageNum);
+            this.fruitsMapList.Add(fruitsMap);
         }
     }
 
@@ -55,12 +56,12 @@ public class GameCommon : MonoBehaviour
 
     // フルーツ種類取得
     public List<int> getFrutisTypeList(int stageNum){
-        return this.fruitsTypeList[stageNum - 1];
+        return this.fruitsTypeLists[stageNum - 1];
     }
 
     // フルーツ種類数取得
     public int getFruitsTypeNum(int stageNum){
-        return this.fruitsTypeList[stageNum - 1].Count;
+        return this.fruitsTypeLists[stageNum - 1].Count;
     }
 
     // フルーツ初期配置取得
@@ -97,7 +98,7 @@ public class GameCommon : MonoBehaviour
     // フルーツ配置箇所取得
     public List<float> getFruitsPosList(int squareNum, float size){
         List<float> fruitsPosList = new List<float>();
-        float distance = size * this.fruitsIntervalIndex;
+        float distance = size * Define.fruitsIntervalIndex;
         float leftPos = 0;
         // 偶数配置
         if(squareNum % 2 == 0){
@@ -119,9 +120,10 @@ public class GameCommon : MonoBehaviour
     // 全ステージ数取得
     public int getStageAllNum(){
         if(this.stageAllNum == 0){
-            string path = Application.dataPath + "/Resources/Conf/";
-            string[] initMapFiles = Directory.GetFiles(path + this.initMapPath, "*.txt", SearchOption.AllDirectories);
-            string[] compMapFiles = Directory.GetFiles(path + this.compMapPath, "*.txt", SearchOption.AllDirectories);
+            // 配下の全ファイル取得
+            this.initMapFiles = Resources.LoadAll<TextAsset>(Define.initMapPath);
+            this.compMapFiles = Resources.LoadAll<TextAsset>(Define.compMapPath);
+            // 全ステージ数
             this.stageAllNum = Mathf.Min(initMapFiles.Length, compMapFiles.Length);
         }
         return this.stageAllNum;
@@ -131,22 +133,26 @@ public class GameCommon : MonoBehaviour
     private (int[,], int[,]) getFruitsMaps(int stageNum){
         int initMapRowNum = 0, initMapColumnNum = 0;
         int compMapRowNum = 0, compMapColumnNum = 0;
-        int[,] initMap = this.getFruitsMap(ref initMapRowNum, ref initMapColumnNum, stageNum, this.initMapPath);
-        int[,] compMap = this.getFruitsMap(ref compMapRowNum, ref compMapColumnNum, stageNum, this.compMapPath);
+        List<int> fruitsTypeList = new List<int>();
+        int[,] initMap = this.getArrayFruitsMap(this.initMapFiles[stageNum - 1], ref initMapRowNum, ref initMapColumnNum, ref fruitsTypeList);
+        int[,] compMap = this.getArrayFruitsMap(this.compMapFiles[stageNum - 1], ref compMapRowNum, ref compMapColumnNum, ref fruitsTypeList);
         if(initMapRowNum != compMapRowNum || initMapColumnNum != compMapColumnNum){
             Debug.Log("エラー：初期配置と完成配置の大きさが一致しません（stage" + stageNum + "）");
         }
         this.rowNumList.Add(initMapRowNum);
         this.columnNumList.Add(initMapColumnNum);
+        fruitsTypeList.Sort();
+        this.fruitsTypeLists.Add(fruitsTypeList);
         return (initMap, compMap);
     }
 
-    // フルーツ配置取得
-    private int[,] getFruitsMap(ref int rowNum, ref int columnNum, int stageNum, string path){
-        string txtPath = "Conf/" + path + "/Stage" + stageNum;
-        TextAsset textFile = (TextAsset)Resources.Load(txtPath);
+    // フルーツ配置配列取得
+    private int[,] getArrayFruitsMap(TextAsset textFile, ref int rowNum, ref int columnNum, ref List<int> fruitsTypeList){
+        // 改行区切りで配列化
         string[] textData = textFile.text.Split('\n');
+        // カンマ数で行数取得
         rowNum = textData[0].Split(',').Length;
+        // 改行数で列数取得
         columnNum = textData.Length;
         if(rowNum != columnNum){
             Debug.Log("エラー：縦と横の数が一致しません");
@@ -159,11 +165,8 @@ public class GameCommon : MonoBehaviour
                 int type = int.Parse(tempWords[j]);
                 textWords[i,j] = type;
                 // フルーツの種類格納
-                int num = stageNum - 1;
-                if(this.fruitsTypeList.Count <= num){
-                    this.fruitsTypeList.Add(new List<int>(){type});
-                }else if(!this.fruitsTypeList[num].Contains(type)){
-                    this.fruitsTypeList[num].Add(type);
+                if(!fruitsTypeList.Contains(type)){
+                    fruitsTypeList.Add(type);
                 }
             }
         }

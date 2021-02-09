@@ -5,8 +5,16 @@ namespace Common
 {
     public static class Define
     {
+        public const float fruitsIntervalIndex = 1.2f;
         public const float CLEAR_BASE_TIME = 20.0f;
         public const int CLEAR_BASE_TAP = 10;
+
+        public const string initMapPath = "Conf/InitMap";
+        public const string compMapPath = "Conf/CompMap";
+        public const string TitleScene = "TitleScene";
+        public const string PlayScene = "PlayScene";
+        public const string SelectScene = "SelectScene";
+
     }
 
     public static class Utility

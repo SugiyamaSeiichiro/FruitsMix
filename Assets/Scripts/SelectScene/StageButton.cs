@@ -122,7 +122,7 @@ namespace SelectScene
 
         private void onClickToMainScene(){
             SceneManager.sceneLoaded += GameSceneLoaded;
-            SceneManager.LoadScene("MainScene");
+            SceneManager.LoadScene(Define.PlayScene);
         }
 
         private void GameSceneLoaded(Scene next, LoadSceneMode mode)

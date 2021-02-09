@@ -110,13 +110,13 @@ public class GameClear : MonoBehaviour
 
     // セレクトシーン遷移
     public void onClickToSelectScene(){
-        SceneManager.LoadScene("SelectScene");
+        SceneManager.LoadScene(Define.SelectScene);
     }
 
     // 次のステージ遷移
     public void onClickToNextStageScene(){
         SceneManager.sceneLoaded += GameSceneLoaded;
-        SceneManager.LoadScene("MainScene");
+        SceneManager.LoadScene(Define.PlayScene);
     }
 
     // シーンに情報受け渡し

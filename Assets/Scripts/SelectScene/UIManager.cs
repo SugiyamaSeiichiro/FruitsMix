@@ -15,7 +15,7 @@ namespace SelectScene
         {
             // 共通Script取得
             GameCommon gameCommonScript = GameObject.Find("GameCommon").GetComponent<GameCommon>();
-            for(int i = 0; i < gameCommonScript.stageAllNum; i++){
+            for(int i = 0; i < gameCommonScript.getStageAllNum(); i++){
                 GameObject obj = Instantiate(this.stageButtonPrefab);
                 obj.transform.SetParent(this.stageButtonParent.transform, false);
                 int stageNum = i + 1;

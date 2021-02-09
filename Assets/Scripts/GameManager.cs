@@ -115,8 +115,6 @@ namespace PlayScene
             this.fruitsTypeNum = gameCommonScript.getFruitsTypeNum(stageNum);
             // フルーツSprite取得
             this.fruitsSpriteList = gameCommonScript.fruitsSpriteList;
-            // フルーツ同士の間隔係数
-            this.fruitsIntervalIndex = gameCommonScript.fruitsIntervalIndex;
             // 方向条件取得
             Dictionary<string, bool> directionConditionList = gameCommonScript.getDirectionConditionList(stageNum);
             // 縦方向条件取得

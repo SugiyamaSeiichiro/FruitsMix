@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Common;
 
 namespace PlayScene
 {
@@ -152,7 +153,7 @@ namespace PlayScene
         // タッチしたフルーツのマップ座標を取得
         private void setTouchPosToFruitsMapPos(float touchX, float touchY, ref int mapX, ref int mapY){
             Vector3 paretPos = this.gameObject.transform.position;
-            float interval = this.fruitsScale * this.gameManagerScript.fruitsIntervalIndex;
+            float interval = this.fruitsScale * Define.fruitsIntervalIndex;
             float intervalNum = interval * (this.squareNum - 1) * 0.5f;
             float leftX = paretPos.x - intervalNum;
             float topY = paretPos.y + intervalNum;

@@ -11,7 +11,7 @@ namespace TitleScene
         // Start is called before the first frame update
         void Start()
         {
-            SceneManager.LoadScene("SelectScene"); 
+            SceneManager.LoadScene(Define.SelectScene); 
         }
 
         // Update is called once per frame

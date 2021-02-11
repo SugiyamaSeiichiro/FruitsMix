@@ -45,6 +45,8 @@ public class GameClear : MonoBehaviour
         }
         // クリア画面表示
         this.gameObject.SetActive(true);
+        // 広告表示
+        GameObject.Find("UnityAds").GetComponent<UnityAds>().ShowAd();
     }
 
     // 初期処理

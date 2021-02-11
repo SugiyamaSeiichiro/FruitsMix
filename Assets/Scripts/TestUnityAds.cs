@@ -56,6 +56,9 @@ const string IOS_ID = "4006166";    // iOSのゲームID
     // 準備ができたら広告再生
         if (Advertisement.IsReady("rewardedVideo"))
         {
+ //           ShowOptions options = new ShowOptions();
+ //           options.resultCallback = OnUnityAdsDidFinish;
+
             //Advertisement.Show();
             Advertisement.Show("rewardedVideo");   // スキップ不可の動画広告
             Debug.Log("rewardedVideo");
@@ -80,6 +83,7 @@ const string IOS_ID = "4006166";    // iOSのゲームID
     public void OnUnityAdsReady(string placementId)
     {
         Debug.Log($"{placementId}の準備が完了");
+        // 広告を初期化しても準備ができるまで時間がかかるので、イベントとして
     }
 
     //広告でエラーが発生

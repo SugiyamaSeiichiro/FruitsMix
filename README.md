@@ -8,5 +8,8 @@ FruitsMix
 仕様書
 https://docs.google.com/spreadsheets/d/1sevw2qJ64Lajsa_FWBMoRVIfaED33r5f6PRTEWJ-w3k/edit#gid=0
 
+ステージルール
+https://docs.google.com/spreadsheets/d/1sov5XOWZ7gnxVq2nN2WtEnpy7-kMno_urtDGNoIY7Nk/edit#gid=0
+
 作品紹介動画はこちら！
 https://www.youtube.com/watch?v=fk4uUUOVgSo

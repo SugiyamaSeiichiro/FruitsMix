@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,30 +8,37 @@ using Common;
 
 namespace SelectScene
 {
-    public class StageButton : MonoBehaviour
+    public class StageInfoModal : MonoBehaviour
     {
         private GameCommon gameCommonScript;
+        public GameObject stageInfoModal;
         public Text titleText;
         public Text squareNumText;
         public Text typeNumText;
         public Text bestTimeNumText;
         public Text bestTapNumText;
-        public Button startButton;
         public GameObject fruitsImagePrefab;
         public GameObject fruitsInitMapParent;
         public GameObject fruitsCompMapParent;
         public GameObject starImagesParent;
+        public GameObject directionConditionTextParent;
         private int rowNum;
         private int columnNum;
         private int stageNum;
         private int squareNum;
         private int typeNum;
+        private Dictionary<string, bool> directionConditionList;
         private StageInfo stageInfo;
         private readonly Dictionary<int, float> fruitsSizeList = new Dictionary<int, float>(){
             {3, 42.0f},
             {4, 30.0f},
             {5, 25.0f},
         };
+        private AudioManager audioManager;
+
+        void Start(){
+            this.audioManager = GameObject.Find("AudioManager").GetComponent<AudioManager>();
+        }
 
         // ステージボタン情報設定
         public void setStageButtonInfo(int stageNum){
@@ -41,11 +49,10 @@ namespace SelectScene
             this.columnNum = this.gameCommonScript.getColumnNum(this.stageNum);
             this.squareNum = this.gameCommonScript.getSquareNum(this.stageNum);
             this.typeNum = this.gameCommonScript.getFruitsTypeNum(this.stageNum);
+            this.directionConditionList = this.gameCommonScript.getDirectionConditionList(this.stageNum);
             // クリア情報取得
             string key = "stage" + this.stageNum.ToString();
             this.stageInfo = PlayerPrefsUtils.GetObject<StageInfo>(key);
-            // ボタンのクリック設定
-            this.startButton.onClick.AddListener(() => onClickToMainScene());
             // 文字の作成
             this.setText();
             // ステージボタン設定
@@ -61,10 +68,18 @@ namespace SelectScene
 
         // テキスト作成
         private void setText(){
-            this.titleText.text = "ステージ " + this.stageNum.ToString();
+            this.titleText.text = "Stage " + this.stageNum.ToString();
             this.typeNumText.text = this.typeNum.ToString() + "種類";
             this.squareNumText.text = this.rowNum.ToString() + "×" + this.columnNum.ToString() + "マス";
-            if(this.stageInfo != null){
+            // 方向条件
+            string[] directionKeyList = {"vertical", "horizontal", "diagonal"};
+            for(int i = 0; i < this.directionConditionTextParent.transform.childCount; i++){
+                if(!this.directionConditionList[directionKeyList[i]]){
+                    this.directionConditionTextParent.transform.GetChild(i).gameObject.SetActive(false);
+                }
+            }
+            // 最高記録
+            if(this.stageInfo != null && this.stageInfo.clearFlg){
                 this.bestTimeNumText.text = "BestTime: " + this.stageInfo.timeNum.ToString("f0") + "sec";
                 this.bestTapNumText.text = "BestTap: " + this.stageInfo.tapNum.ToString();
             }
@@ -73,24 +88,24 @@ namespace SelectScene
         // ステージボタン設定
         private void setStageButton(){
             // クリア済の場合、外郭の色を変更
-            if(this.stageInfo != null){
-                this.gameObject.GetComponent<Outline>().effectColor = Color.yellow;
+            if(this.stageInfo != null && this.stageInfo.clearFlg){
+                this.stageInfoModal.GetComponent<Outline>().effectColor = Color.yellow;
             }
             // 難易度別に色を変更
             // マス数と種類数の合計
-            int score = this.squareNum + this.typeNum;
+            int level = this.squareNum;
             Color color;
             // 難易度：簡単
-            if(score <= 6){
+            if(level <= 3){
                 color =  new Color(  0f/255f, 200f/255f, 255f/255f);
             // 難易度：普通
-            }else if(score <= 8){
+            }else if(level <= 4){
                 color =  new Color( 40f/255f, 255f/255f,   0f/255f);
             // 難易度：難しい
             }else{
-                color =  new Color(255f/255f, 180f/255f,   0f/255f);
+                color =  new Color(255f/255f, 80/255f,   80f/255f);
             }
-            this.gameObject.GetComponent<Image>().color = color;
+            this.stageInfoModal.GetComponent<Image>().color = color;
         }
 
         // 星UI作成
@@ -120,9 +135,17 @@ namespace SelectScene
             }
         }
 
-        private void onClickToMainScene(){
+        // モーダル削除
+        public void onClickToDestroy(){
+            Destroy(this.gameObject);
+            this.audioManager.playSE(SE_TYPE.BUTTON);
+        }
+
+        // プレイシーン移動
+        public void onClickToPlayScene(){
             SceneManager.sceneLoaded += GameSceneLoaded;
             SceneManager.LoadScene(Define.PlayScene);
+            this.audioManager.playSE(SE_TYPE.BUTTON);
         }
 
         private void GameSceneLoaded(Scene next, LoadSceneMode mode)

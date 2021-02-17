@@ -9,9 +9,10 @@ namespace PlayScene
 {
     public class FruitsMap : MonoBehaviour
     {
+        public bool touchFlag = true;
         public GameObject fruitsPrefab;
         public GameManager gameManagerScript;
-        public AudioManager audioManagerScript;
+        private AudioManager audioManager;
 
         private int rowNum;
         private int columnNum;
@@ -69,12 +70,13 @@ namespace PlayScene
                     this.playMatchedBlink(j, i, false);
                 }
             }
+            this.audioManager = GameObject.Find("AudioManager").GetComponent<AudioManager>();
         }
 
         // Update is called once per frame
         void Update()
         {
-            if(this.gameManagerScript.isClearFlg){
+            if(this.gameManagerScript.isClearFlg || this.touchFlag == false){
                 return;
             }
             if(Input.GetMouseButtonDown(0)){
@@ -122,7 +124,7 @@ namespace PlayScene
                 return;
             }
             // フルーツタップSE
-            this.audioManagerScript.playFruitsTapSE();
+            this.audioManager.playSE(SE_TYPE.FRUITS_TAP);
             // マップ座標計算
             float x = hit.collider.gameObject.transform.position.x;
             float y = hit.collider.gameObject.transform.position.y;
@@ -239,7 +241,7 @@ namespace PlayScene
             // 現在配置と完成図が一致している場合
             if(this.curMap[y,x] == this.compMap[y,x]){
                 if(audioFlg){
-                    this.audioManagerScript.playFruitsMatchSE();
+                    this.audioManager.playSE(SE_TYPE.FRUITS_MATCH);
                 }
                 blinker.setMatchedBlink(true);
             }else{

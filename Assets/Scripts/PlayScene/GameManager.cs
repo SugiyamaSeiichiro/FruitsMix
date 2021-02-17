@@ -10,7 +10,7 @@ namespace PlayScene
     {
         public FruitsMap fruitsMapScript;
         public PlayScene.UIManager uiManagerScript;
-        public AudioManager audioManagerScript;
+        private AudioManager audioManager;
         public float timeNum;
         public int tapNum;
         public int stageNum;
@@ -38,6 +38,7 @@ namespace PlayScene
             this.isClearFlg = false;
             // ステージの各パラメーター設定
             this.setStageParameter(this.stageNum);
+            this.audioManager = GameObject.Find("AudioManager").GetComponent<AudioManager>();
         }
 
         // 更新処理
@@ -46,7 +47,7 @@ namespace PlayScene
                 if(this.isClearFlg){
                     this.isPlayEndFlg = true;
                     this.fruitsMapScript.playAllMatchedBlink();
-                    this.audioManagerScript.playGameClearSE();
+                    this.audioManager.playSE(SE_TYPE.FRUITS_ALL_MATCH);
                     Invoke("showGameClearUI", 1.5f);
                 }else{
                     this.timeNum += Time.deltaTime;
@@ -93,6 +94,7 @@ namespace PlayScene
         // ゲームクリアUI表示
         private void showGameClearUI(){
             this.uiManagerScript.showGameClearUI();
+            this.audioManager.playSE(SE_TYPE.GAME_CLEAR);
         }
 
         // ステージの各パラメーター設定

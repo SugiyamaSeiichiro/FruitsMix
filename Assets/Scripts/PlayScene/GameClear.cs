@@ -25,6 +25,10 @@ public class GameClear : MonoBehaviour
         // クリア情報保存、取得
         Dictionary<string, bool> newRecordList = new Dictionary<string, bool>();
         StageInfo stageInfo = this.getSaveData(stageNum, timeNum, tapNum, ref newRecordList);
+        // 次のステージを解放
+        if(stageNum < stageAllNum){
+            this.setNextStage(stageNum);
+        }
         // ステージ数、時間、タップ数表示
         this.stageNumText.text = "STAGE " + stageNum.ToString();
         this.bestTimeText.text = "BestTime : " + stageInfo.timeNum.ToString("f0");
@@ -72,7 +76,9 @@ public class GameClear : MonoBehaviour
         // 前回の情報取得
         StageInfo beforeStageInfo = PlayerPrefsUtils.GetObject<StageInfo>(key);
         // 前回の情報がある場合
-        if(beforeStageInfo != null){
+        if(beforeStageInfo != null && beforeStageInfo.clearFlg){
+            // クリア
+            stageInfo.clearFlg = true;
             // 時間
             stageInfo.timeNum = (timeNum < beforeStageInfo.timeNum) ? timeNum : beforeStageInfo.timeNum;
             // タップ数
@@ -89,6 +95,8 @@ public class GameClear : MonoBehaviour
             newRecordList["tap"] = (beforeStageInfo.tapNum != stageInfo.tapNum);
         // 新規情報追加の場合
         }else{
+            // クリア
+            stageInfo.clearFlg = true;
             // 時間
             stageInfo.timeNum = timeNum;
             // タップ数
@@ -108,6 +116,16 @@ public class GameClear : MonoBehaviour
         PlayerPrefsUtils.SetObject(key, stageInfo);
 
         return stageInfo;
+    }
+
+    private void setNextStage(int stageNum){
+        int nextStageNum = stageNum + 1;
+        string key = "stage" + nextStageNum.ToString();
+        StageInfo beforeStageInfo = PlayerPrefsUtils.GetObject<StageInfo>(key);
+        if(beforeStageInfo == null){
+            StageInfo stageInfo = new StageInfo();
+            PlayerPrefsUtils.SetObject(key, stageInfo);
+        }
     }
 
     // セレクトシーン遷移

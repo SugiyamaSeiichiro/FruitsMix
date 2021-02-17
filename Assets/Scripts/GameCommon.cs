@@ -32,6 +32,16 @@ public class GameCommon : MonoBehaviour
             (int[,], int[,]) fruitsMap = this.getFruitsMaps(stageNum);
             this.fruitsMapList.Add(fruitsMap);
         }
+        // 初期解放ステージの設定
+        foreach (int stageNum in Define.RELEASE_STAGE_LIST)
+        {
+            string key = "stage" + stageNum.ToString();
+            StageInfo beforeStageInfo = PlayerPrefsUtils.GetObject<StageInfo>(key);
+            if(beforeStageInfo == null){
+                StageInfo stageInfo = new StageInfo();
+                PlayerPrefsUtils.SetObject(key, stageInfo);
+            }
+        }
     }
 
     // フルーツ画像取得
@@ -127,6 +137,12 @@ public class GameCommon : MonoBehaviour
             this.stageAllNum = Mathf.Min(initMapFiles.Length, compMapFiles.Length);
         }
         return this.stageAllNum;
+    }
+
+    public StageInfo getStageInfo(int stageNum){
+        string key = "stage" + stageNum.ToString();
+        StageInfo stageInfo = PlayerPrefsUtils.GetObject<StageInfo>(key);
+        return stageInfo;
     }
 
     // フルーツ初期、完成配置取得

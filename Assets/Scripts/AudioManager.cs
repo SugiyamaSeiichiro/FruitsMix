@@ -2,41 +2,90 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum SE_TYPE
+{
+    FRUITS_TAP,
+    FRUITS_MATCH,
+    FRUITS_ALL_MATCH,
+    GAME_CLEAR,
+    BUTTON,
+}
+
+public enum BGM_TYPE
+{
+
+}
+
 public class AudioManager : MonoBehaviour
 {
-    public AudioClip fruitsTapSE;
-    public AudioClip fruitsMatchSE;
-    public AudioClip fruitsAllMatchSE;
-    public AudioClip gameClearSE;
+    public AudioSource seAudioSource;
+    public AudioSource bgmAudioSource;
+    public List<AudioClip> seAudioClipList;
+    public List<AudioClip> bgmAudioClipList;
 
-    private AudioSource audioSource;
+    private string audioInfoKey = "audioInfo";
+    private AudioInfo audioInfo = new AudioInfo();
+
+    public class AudioInfo
+    {
+        public bool seFlg = true;
+        public bool bgmFlg = true;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        audioSource = GetComponent<AudioSource>();
+        DontDestroyOnLoad(this);
+        AudioInfo audioInfo = PlayerPrefsUtils.GetObject<AudioInfo>(this.audioInfoKey);
+        if(audioInfo != null){
+            this.audioInfo.seFlg = audioInfo.seFlg;
+            this.audioInfo.bgmFlg = audioInfo.bgmFlg;
+        }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    public void playSE(SE_TYPE type){
+        if(this.isSeFlg() == false){
+            return;
+        }
+        AudioClip audioClip = this.seAudioClipList[(int)type];
+        this.seAudioSource.PlayOneShot(audioClip);
     }
 
-    public void playFruitsTapSE(){
-        this.audioSource.PlayOneShot(fruitsTapSE);
+    public void playBGM(BGM_TYPE type){
+        if(this.isBgmFlg() == false){
+            return;
+        }
+        AudioClip audioClip = this.bgmAudioClipList[(int)type];
+        this.bgmAudioSource.PlayOneShot(audioClip);
     }
 
-    public void playFruitsMatchSE(){
-        this.audioSource.PlayOneShot(fruitsMatchSE);
+    public void startSE(){
+        this.audioInfo.seFlg = true;
+        PlayerPrefsUtils.SetObject(this.audioInfoKey, this.audioInfo);
     }
 
-    public void playGameClearSE(){
-        this.audioSource.PlayOneShot(fruitsAllMatchSE);
-        StartCoroutine(this.playGameClearSE(1.5f));
+    public void stopSE(){
+        this.audioInfo.seFlg = false;
+        PlayerPrefsUtils.SetObject(this.audioInfoKey, this.audioInfo);
+        this.seAudioSource.Stop();
     }
 
-    private IEnumerator playGameClearSE(float delay) {
-        yield return new WaitForSeconds(delay);
-        this.audioSource.PlayOneShot(gameClearSE);
+    public void startBGM(){
+        this.audioInfo.bgmFlg = true;
+        PlayerPrefsUtils.SetObject(this.audioInfoKey, this.audioInfo);
+    }
+
+    public void stopBGM(){
+        this.audioInfo.bgmFlg = false;
+        PlayerPrefsUtils.SetObject(this.audioInfoKey, this.audioInfo);
+        this.bgmAudioSource.Stop();
+    }
+
+    public bool isSeFlg(){
+        return this.audioInfo.seFlg;
+    }
+
+    public bool isBgmFlg(){
+        return this.audioInfo.bgmFlg;
     }
 }

@@ -93,28 +93,21 @@ namespace SelectScene
             }
             // 難易度別に色を変更
             // マス数と種類数の合計
-            int level = this.squareNum;
-            Color color;
-            // 難易度：簡単
-            if(level <= 3){
-                color =  new Color(  0f/255f, 200f/255f, 255f/255f);
-            // 難易度：普通
-            }else if(level <= 4){
-                color =  new Color( 40f/255f, 255f/255f,   0f/255f);
-            // 難易度：難しい
-            }else{
-                color =  new Color(255f/255f, 80/255f,   80f/255f);
-            }
-            this.stageInfoModal.GetComponent<Image>().color = color;
+            int level = this.squareNum - 3;
+            this.stageInfoModal.GetComponent<Image>().color = Utility.getLevelColor(level);
         }
 
         // 星UI作成
         private void setStarUI(){
+            List<string> missionTextList = Utility.getMissionTextList(this.typeNum, this.squareNum);
+
             for(int i = 0; i < this.starImagesParent.transform.childCount; i++){
                 GameObject obj = this.starImagesParent.transform.GetChild(i).gameObject;
                 if(this.stageInfo == null || !this.stageInfo.clearList[i]){
                     obj.GetComponent<Image>().color = Color.gray;
                 }
+                Text text = obj.transform.GetChild(0).gameObject.GetComponent<Text>();
+                text.text = missionTextList[i];
             }
         }
 

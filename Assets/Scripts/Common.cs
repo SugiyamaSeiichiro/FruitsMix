@@ -37,6 +37,20 @@ namespace Common
             return (typeNum - 2) * (squareNum - 2) * Define.CLEAR_BASE_TAP;
         }
 
+        public static List<string> getMissionTextList(int typeNum, int squareNum){
+            List<string> missionTextList = new List<string>();
+            // クリア判定タイム数
+            float clearTimeNum = Utility.getClearTimeNum(typeNum, squareNum);
+            missionTextList.Add(clearTimeNum.ToString("f0"));
+            // クリア判定タップ数
+            int clearTapNum = Utility.getClearTapNum(typeNum, squareNum);
+            missionTextList.Add(clearTapNum.ToString());
+            // 両方判定
+            missionTextList.Add(clearTimeNum.ToString("f0") + "&" + clearTapNum.ToString());
+
+            return missionTextList;
+        }
+
         public static List<float> getCenterPosList(int num, float size, float intervalNum){
             List<float> fruitsPosList = new List<float>();
             float distance = size * intervalNum;
@@ -54,6 +68,25 @@ namespace Common
                 fruitsPosList.Add(pos);
             }
             return fruitsPosList;
+        }
+
+        public static Color getLevelColor(int level){
+            Color color;
+            switch(level){
+                // 難易度：簡単
+                case 0:
+                    color =  new Color(  0f/255f, 200f/255f, 255f/255f);
+                    break;
+                // 難易度：普通
+                case 1:
+                    color =  new Color( 40f/255f, 255f/255f,   0f/255f);
+                    break;
+                // 難易度：難しい
+                default:
+                    color =  new Color(255f/255f, 80/255f,   80f/255f);
+                    break;
+            }
+            return color;
         }
     }
 

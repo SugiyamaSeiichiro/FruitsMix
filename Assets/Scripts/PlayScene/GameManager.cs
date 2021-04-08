@@ -39,6 +39,7 @@ namespace PlayScene
             // ステージの各パラメーター設定
             this.setStageParameter(this.stageNum);
             this.audioManager = GameObject.Find("AudioManager").GetComponent<AudioManager>();
+            this.audioManager.playBGM(BGM_TYPE.PLAY_SCENE);
         }
 
         // 更新処理
@@ -51,7 +52,7 @@ namespace PlayScene
                     Invoke("showGameClearUI", 1.5f);
                 }else{
                     this.timeNum += Time.deltaTime;
-                    this.uiManagerScript.timeText.text = "タイム：" + this.timeNum.ToString("f0").PadLeft(4);
+                    this.uiManagerScript.timeText.text = "Time：" + this.timeNum.ToString("f0").PadLeft(4);
                 }
             }
         }

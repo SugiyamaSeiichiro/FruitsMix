@@ -24,6 +24,7 @@ namespace SelectScene
         void Start()
         {
             this.audioManager = GameObject.Find("AudioManager").GetComponent<AudioManager>();
+            this.audioManager.playBGM(BGM_TYPE.SELECT_SCENE);
             this.createPage(this.pageNum);
         }
 
@@ -51,6 +52,9 @@ namespace SelectScene
             backPageButton.gameObject.SetActive(startNum > 0);
             // 次ページボタン
             nextPageButton.gameObject.SetActive(endNum < this.stageAllNum);
+            // 背景色の変更
+            int level = gameCommonScript.getSquareNum(startNum + 1) - 3;
+            Camera.main.backgroundColor = Utility.getLevelColor(level);
         }
 
         // ステージボタン生成

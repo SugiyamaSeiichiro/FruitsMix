@@ -60,6 +60,8 @@ public class GameClear : MonoBehaviour
         this.typeNum = gameCommonScript.getFruitsTypeNum(stageNum);
         this.squareNum = gameCommonScript.getSquareNum(stageNum);
         this.stageAllNum = gameCommonScript.getStageAllNum();
+        // AudioManager audioManager = GameObject.Find("AudioManager").GetComponent<AudioManager>();
+        // audioManager.playBGM(BGM_TYPE.RESULT_SCENE);
     }
 
     // クリア情報を保存、取得

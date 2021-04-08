@@ -134,6 +134,7 @@ GameObject:
   - component: {fileID: 658246012}
   - component: {fileID: 658246014}
   - component: {fileID: 658246013}
+  - component: {fileID: 658246015}
   m_Layer: 5
   m_Name: TapToStartText
   m_TagString: Untagged
@@ -158,7 +159,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -150}
-  m_SizeDelta: {x: 160, y: 30}
+  m_SizeDelta: {x: 200, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &658246013
 MonoBehaviour:
@@ -182,11 +183,11 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 25
+    m_FontSize: 35
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 2
-    m_MaxSize: 40
+    m_MinSize: 0
+    m_MaxSize: 100
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
@@ -202,6 +203,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 658246011}
   m_CullTransparentMesh: 0
+--- !u!114 &658246015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 658246011}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f63826fd7d0641fd8dcf801d54821e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fadeStart: 1
+  fadeFlg: 1
+  fadeSpeed: 1
 --- !u!1 &671232372
 GameObject:
   m_ObjectHideFlags: 0
@@ -449,14 +465,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   seAudioSource: {fileID: 1795030930}
-  bgmAudioSource: {fileID: 1795030930}
+  bgmAudioSource: {fileID: 1795030928}
   seAudioClipList:
   - {fileID: 8300000, guid: 78e4b816db41f4e5b9a29bffb9011f69, type: 3}
   - {fileID: 8300000, guid: 3519d14a8a32c4b9f8dd35fc2f504a9b, type: 3}
   - {fileID: 8300000, guid: cb20f6b9dbd9d4bb3a200a7e67b3d92c, type: 3}
   - {fileID: 8300000, guid: a697b840dba5044f29486b96bc16a16d, type: 3}
   - {fileID: 8300000, guid: 22afc6fb28ba946eab571d29c4c748fa, type: 3}
-  bgmAudioClipList: []
+  bgmAudioClipList:
+  - {fileID: 8300000, guid: 85495c930c3b54441aba37fef9b4fc5f, type: 3}
+  - {fileID: 8300000, guid: b90367db7f8684549bb44e2232f3161b, type: 3}
+  - {fileID: 8300000, guid: 3099bf5285a51452097227c0c0ade3dd, type: 3}
+  - {fileID: 8300000, guid: cd42214cbeae64dde8f775267b37046f, type: 3}
 --- !u!82 &1795030928
 AudioSource:
   m_ObjectHideFlags: 0
@@ -471,7 +491,7 @@ AudioSource:
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0

@@ -13,7 +13,10 @@ public enum SE_TYPE
 
 public enum BGM_TYPE
 {
-
+    TITLE_SCENE,
+    SELECT_SCENE,
+    PLAY_SCENE,
+    RESULT_SCENE,
 }
 
 public class AudioManager : MonoBehaviour
@@ -52,11 +55,20 @@ public class AudioManager : MonoBehaviour
     }
 
     public void playBGM(BGM_TYPE type){
-        if(this.isBgmFlg() == false){
+        AudioClip audioClip = this.bgmAudioClipList[(int)type];
+        // 同じ音楽の場合、続けて再生
+        bool audioClipFlg = this.bgmAudioSource.clip != null &&
+                            this.bgmAudioSource.clip.samples != audioClip.samples;
+        if(this.bgmAudioSource.clip == null || audioClipFlg){
+            this.bgmAudioSource.clip = audioClip;
+        }else{
             return;
         }
-        AudioClip audioClip = this.bgmAudioClipList[(int)type];
-        this.bgmAudioSource.PlayOneShot(audioClip);
+        if(this.isBgmFlg() == false){
+            this.bgmAudioSource.Stop();
+            return;
+        }
+        this.bgmAudioSource.Play();
     }
 
     public void startSE(){
@@ -73,6 +85,7 @@ public class AudioManager : MonoBehaviour
     public void startBGM(){
         this.audioInfo.bgmFlg = true;
         PlayerPrefsUtils.SetObject(this.audioInfoKey, this.audioInfo);
+        this.bgmAudioSource.Play();
     }
 
     public void stopBGM(){

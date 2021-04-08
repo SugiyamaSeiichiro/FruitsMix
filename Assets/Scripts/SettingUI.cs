@@ -32,7 +32,9 @@ public class SettingUI : MonoBehaviour
         }else{
             Time.timeScale = 1f;
         }
-        this.furitsMap.GetComponent<PlayScene.FruitsMap>().touchFlag = !this.pauseFlg;
+        if(this.furitsMap != null){
+            this.furitsMap.GetComponent<PlayScene.FruitsMap>().touchFlag = !this.pauseFlg;
+        }
         this.shadowImage.SetActive(this.pauseFlg);
         this.menuButtonParent.SetActive(this.pauseFlg);
         this.audioManager.playSE(SE_TYPE.BUTTON);

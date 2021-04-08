@@ -138,7 +138,7 @@ namespace PlayScene
             this.changeOtherFruitsObject(this.changeOtherFruitsObjectList);
             // 手数を記録
             this.gameManagerScript.tapNum++;
-            this.gameManagerScript.uiManagerScript.tapText.text = "タップ：" + this.gameManagerScript.tapNum.ToString().PadLeft(4);
+            this.gameManagerScript.uiManagerScript.tapText.text = "Tap  ：" + this.gameManagerScript.tapNum.ToString().PadLeft(4);
         }
 
         // 次フルーツUI表示処理

@@ -18,6 +18,8 @@ namespace TitleScene
         void Update()
         {
             if(Input.GetMouseButtonDown(0)){
+                AudioManager audioManager = GameObject.Find("AudioManager").GetComponent<AudioManager>();
+                audioManager.playSE(SE_TYPE.BUTTON);
                 SceneManager.LoadScene(Define.SelectScene);
             }
         }

@@ -28,7 +28,8 @@ for($i = MIN_STAGE_NO; $i <= MAX_STAGE_NO; $i++){
         $count++;
     }
 
-    file_put_contents('../../Assets/Resouces/Stages/'.$i.".txt", $squaresString);  
+    file_put_contents('../Resorces/Stages/'.$i.".txt", $squaresString);  
+    //file_put_contents('../../Assets/Resouces/Stages/'.$i.".txt", $squaresString);  
 
 }
 

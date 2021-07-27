@@ -26,8 +26,9 @@ for($i = MIN_STAGE_NO; $i <= MAX_STAGE_NO; $i++){
         $squaresString[$count] = (string) mt_rand(MIN_FRUITS_NO, MAX_FRUITS_NO);
         $count++;
     }
-
-    file_put_contents('../../Assets/Resouces/Stages/'.$i.".txt", $squaresString);  
+    
+    file_put_contents('../Resorces/Stages/'.$i.".txt", $squaresString);  
+    // file_put_contents('../../Assets/Resouces/Stages/'.$i.".txt", $squaresString);  
 
 }
 

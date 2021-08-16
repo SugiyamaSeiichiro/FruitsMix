@@ -1,0 +1,195 @@
+﻿using System;
+using System.IO;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Common;
+
+// ステージ情報
+public class GameCommon : MonoBehaviour
+{
+    public List<Sprite> fruitsSpriteList;
+
+    private int stageAllNum = 0;
+    private TextAsset[] initMapFiles;
+    private TextAsset[] compMapFiles;
+    private List<List<int>> fruitsTypeLists = new List<List<int>>();
+    private List<(int[,], int[,])> fruitsMapList = new List<(int[,], int[,])>();
+    private List<int> rowNumList = new List<int>();
+    private List<int> columnNumList = new List<int>();
+    private Dictionary<int, Dictionary<string, bool>> stageDirectionConditionList = new Dictionary<int, Dictionary<string, bool>>(){
+        {1, new Dictionary<string, bool>(){{"vertical", true}, {"horizontal", true}, {"diagonal", true}}},
+        {2, new Dictionary<string, bool>(){{"vertical", true}, {"horizontal", true}, {"diagonal", true}}},
+        {3, new Dictionary<string, bool>(){{"vertical", true}, {"horizontal", true}, {"diagonal", true}}},
+    };
+
+    void Start(){
+        DontDestroyOnLoad(this);
+        // 全ステージ情報取得
+        int stageAllNum = this.getStageAllNum();
+        for(int i = 0; i < stageAllNum; i++){
+            int stageNum = i + 1;
+            (int[,], int[,]) fruitsMap = this.getFruitsMaps(stageNum);
+            this.fruitsMapList.Add(fruitsMap);
+        }
+        // 初期解放ステージの設定
+        foreach (int stageNum in Define.RELEASE_STAGE_LIST)
+        {
+            string key = "stage" + stageNum.ToString();
+            StageInfo beforeStageInfo = PlayerPrefsUtils.GetObject<StageInfo>(key);
+            if(beforeStageInfo == null){
+                StageInfo stageInfo = new StageInfo();
+                PlayerPrefsUtils.SetObject(key, stageInfo);
+            }
+        }
+    }
+
+    // フルーツ画像取得
+    public Sprite getFrutisSprite(int type){
+        return this.fruitsSpriteList[type];
+    }
+
+    // 行数取得
+    public int getRowNum(int stageNum){
+        return this.rowNumList[stageNum - 1];
+    }
+
+    // 列数取得
+    public int getColumnNum(int stageNum){
+        return this.columnNumList[stageNum - 1];
+    }
+
+    // マス数取得
+    public int getSquareNum(int stageNum){
+        return this.rowNumList[stageNum - 1];
+    }
+
+    // フルーツ種類取得
+    public List<int> getFrutisTypeList(int stageNum){
+        return this.fruitsTypeLists[stageNum - 1];
+    }
+
+    // フルーツ種類数取得
+    public int getFruitsTypeNum(int stageNum){
+        return this.fruitsTypeLists[stageNum - 1].Count;
+    }
+
+    // フルーツ初期配置取得
+    public int[,] getFruitsInitMap(int stageNum){
+        (int[,] init, int[,] comp) fruitsMap = this.fruitsMapList[stageNum - 1];
+        int rowNum = this.getRowNum(stageNum);
+        int columnNum = this.getColumnNum(stageNum);
+        int[,] initMap = new int[columnNum, rowNum];
+        Array.Copy(fruitsMap.init, 0, initMap, 0, fruitsMap.init.Length);
+        return initMap;
+    }
+
+    // フルーツ完成配置取得
+    public int[,] getFruitsCompMap(int stageNum){
+        (int[,] init, int[,] comp) fruitsMap = this.fruitsMapList[stageNum - 1];
+        int rowNum = this.getRowNum(stageNum);
+        int columnNum = this.getColumnNum(stageNum);
+        int[,] compMap = new int[columnNum, rowNum];
+        Array.Copy(fruitsMap.comp, 0, compMap, 0, fruitsMap.comp.Length);
+        return compMap;
+    }
+
+    // 方向条件取得
+    public Dictionary<string, bool> getDirectionConditionList(int stageNum){
+        Dictionary<string, bool> directionConditionList = new Dictionary<string, bool>();
+        if(this.stageDirectionConditionList.ContainsKey(stageNum)){
+            directionConditionList = this.stageDirectionConditionList[stageNum];
+        }else{
+            directionConditionList = new Dictionary<string, bool>(){{"vertical", true}, {"horizontal", true}, {"diagonal", true}};
+        }
+        return directionConditionList;
+    }
+
+    // フルーツ配置箇所取得
+    public List<float> getFruitsPosList(int squareNum, float size){
+        List<float> fruitsPosList = new List<float>();
+        float distance = size * Define.fruitsIntervalIndex;
+        float leftPos = 0;
+        // 偶数配置
+        if(squareNum % 2 == 0){
+            int num = squareNum / 2;
+            leftPos = -num * distance + distance/2;
+        // 奇数配置
+        }else{
+            int num = (squareNum - 1) / 2;
+            leftPos = -num * distance;
+        }
+        // 位置格納
+        for(int i = 0; i < squareNum; i++){
+            float pos = leftPos + (i * distance);
+            fruitsPosList.Add(pos);
+        }
+        return fruitsPosList;
+    }
+
+    // 全ステージ数取得
+    public int getStageAllNum(){
+        if(this.stageAllNum == 0){
+            // 配下の全ファイル取得
+            this.initMapFiles = Resources.LoadAll<TextAsset>(Define.initMapPath);
+            this.compMapFiles = Resources.LoadAll<TextAsset>(Define.compMapPath);
+            // 全ステージ数
+            this.stageAllNum = Mathf.Min(initMapFiles.Length, compMapFiles.Length);
+        }
+        return this.stageAllNum;
+    }
+
+    public StageInfo getStageInfo(int stageNum){
+        string key = "stage" + stageNum.ToString();
+        StageInfo stageInfo = PlayerPrefsUtils.GetObject<StageInfo>(key);
+        return stageInfo;
+    }
+
+    // フルーツ初期、完成配置取得
+    private (int[,], int[,]) getFruitsMaps(int stageNum){
+        int initMapRowNum = 0, initMapColumnNum = 0;
+        int compMapRowNum = 0, compMapColumnNum = 0;
+        List<int> fruitsTypeList = new List<int>();
+        int[,] initMap = this.getArrayFruitsMap(this.initMapFiles[stageNum - 1], ref initMapRowNum, ref initMapColumnNum, ref fruitsTypeList);
+        int[,] compMap = this.getArrayFruitsMap(this.compMapFiles[stageNum - 1], ref compMapRowNum, ref compMapColumnNum, ref fruitsTypeList);
+        if(initMapRowNum != compMapRowNum || initMapColumnNum != compMapColumnNum){
+            Debug.Log("エラー：初期配置と完成配置の大きさが一致しません（stage" + stageNum + "）");
+        }
+        this.rowNumList.Add(initMapRowNum);
+        this.columnNumList.Add(initMapColumnNum);
+        fruitsTypeList.Sort();
+        this.fruitsTypeLists.Add(fruitsTypeList);
+        return (initMap, compMap);
+    }
+
+    // フルーツ配置配列取得
+    private int[,] getArrayFruitsMap(TextAsset textFile, ref int rowNum, ref int columnNum, ref List<int> fruitsTypeList){
+        // 改行区切りで配列化
+        string[] textData = textFile.text.Split('\n');
+        // カンマ数で行数取得
+        rowNum = textData[0].Split(',').Length;
+        // 改行数で列数取得
+        columnNum = textData.Length;
+        if(rowNum != columnNum){
+            Debug.Log("エラー：縦と横の数が一致しません");
+        }
+        // 二次元配列に格納
+        int[,] textWords = new int[columnNum, rowNum];
+        for(int i = 0; i < columnNum; i++){
+            string[] tempWords = textData[i].Split(',');
+            for(int j = 0; j < rowNum; j++){
+                int type = 0;
+                bool result = int.TryParse(tempWords[j], out type);
+                if(result == false){
+                    Debug.Log(textFile.name + ".txtに、数字以外が含まれています");
+                }
+                textWords[i,j] = type;
+                // フルーツの種類格納
+                if(!fruitsTypeList.Contains(type)){
+                    fruitsTypeList.Add(type);
+                }
+            }
+        }
+        return textWords;
+    }
+}

@@ -5,7 +5,7 @@ namespace Common
 {
     public static class Define
     {
-        public static readonly int[] RELEASE_STAGE_LIST = {1,16};
+        public static readonly int[] RELEASE_STAGE_LIST = {1,46,91};
         public const float fruitsIntervalIndex = 1.2f;
         public const float CLEAR_BASE_TIME = 20.0f;
         public const int CLEAR_BASE_TAP = 10;

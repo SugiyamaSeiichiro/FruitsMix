@@ -178,7 +178,11 @@ public class GameCommon : MonoBehaviour
         for(int i = 0; i < columnNum; i++){
             string[] tempWords = textData[i].Split(',');
             for(int j = 0; j < rowNum; j++){
-                int type = int.Parse(tempWords[j]);
+                int type = 0;
+                bool result = int.TryParse(tempWords[j], out type);
+                if(result == false){
+                    Debug.Log(textFile.name + ".txtに、数字以外が含まれています");
+                }
                 textWords[i,j] = type;
                 // フルーツの種類格納
                 if(!fruitsTypeList.Contains(type)){

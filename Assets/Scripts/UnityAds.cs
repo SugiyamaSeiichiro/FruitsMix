@@ -6,8 +6,8 @@ using UnityEngine.Advertisements;
 
 public class UnityAds : MonoBehaviour, IUnityAdsListener
 {
-const string ANDROID_ID = "4006167";    // AndoridのゲームID
-const string IOS_ID = "4006166";    // iOSのゲームID
+const string ANDROID_ID = "4276417";    // AndoridのゲームID
+const string IOS_ID = "4276416";    // iOSのゲームID
 
 
     /// 広告再生スキップフラグ

@@ -826,7 +826,12 @@ PlayerSettings:
       daydreamIconForeground: {fileID: 0}
       daydreamIconBackground: {fileID: 0}
   cloudServicesEnabled:
-    Unity Ads: 1
+    Analytics: 0
+    Build: 0
+    Collab: 0
+    Game Performance: 0
+    Purchasing: 0
+    Unity Ads: 0
   luminIcon:
     m_Name: 
     m_ModelFolderPath: 
@@ -839,10 +844,10 @@ PlayerSettings:
     m_VersionCode: 1
     m_VersionName: 
   apiCompatibilityLevel: 6
-  cloudProjectId: 23c0b092-f805-4fb6-9fdc-f5bfcaa0de5b
+  cloudProjectId: f47ca4d3-85e0-493d-ac80-706fc4555600
   framebufferDepthMemorylessMode: 0
-  projectName: FruitsMix
-  organizationId: tike0129
+  projectName: FruitsMix (1)
+  organizationId: lontregames
   cloudEnabled: 0
   enableNativePlatformBackendsForNewInputSystem: 0
   disableOldInputManagerSupport: 0

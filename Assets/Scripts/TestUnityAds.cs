@@ -6,8 +6,8 @@ using UnityEngine.Advertisements;
 
 public class TestUnityAds : MonoBehaviour, IUnityAdsListener
 {
-const string ANDROID_ID = "4006167";    // AndoridのゲームID
-const string IOS_ID = "4006166";    // iOSのゲームID
+    const string ANDROID_ID = "4006167";    // AndoridのゲームID
+    const string IOS_ID = "4006166";    // iOSのゲームID
 
 
     /// 広告再生スキップフラグ
@@ -25,7 +25,7 @@ const string IOS_ID = "4006166";    // iOSのゲームID
     Debug.Log("Awake");
         // 初期化
 #if UNITY_ANDROID
-        Advertisement.Initialize(ANDROID_ID, false);
+        Advertisement.Initialize(ANDROID_ID, true);
         Debug.Log("Android");
 #elif UNITY_IOS
         Advertisement.Initialize(IOS_ID, /*テストモードならtrue*/true);

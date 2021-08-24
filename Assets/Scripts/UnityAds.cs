@@ -30,14 +30,14 @@ const string IOS_ID = "4276416";    // iOSのゲームID
         Advertisement.Initialize(ANDROID_ID, false);
         Debug.Log("Android");
 #elif UNITY_IOS
-        Advertisement.Initialize(IOS_ID, /*テストモードならtrue*/true);
+        Advertisement.Initialize(IOS_ID, /*テストモードならtrue*/false);
         Debug.Log("IOS");
 #else
 //        Advertisement.Initialize("");
-        Advertisement.Initialize(ANDROID_ID, /*テストモードならtrue*/true);
+        Advertisement.Initialize(ANDROID_ID, /*テストモードならtrue*/false);
         Debug.Log("ELSE");
 #endif
-    Advertisement.Initialize(ANDROID_ID, /*テストモードならtrue*/true);
+    Advertisement.Initialize(ANDROID_ID, /*テストモードならtrue*/false);
 //        }
     }
 #endregion

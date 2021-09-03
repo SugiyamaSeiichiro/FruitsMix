@@ -30,9 +30,9 @@ namespace SelectScene
         private Dictionary<string, bool> directionConditionList;
         private StageInfo stageInfo;
         private readonly Dictionary<int, float> fruitsSizeList = new Dictionary<int, float>(){
-            {3, 42.0f},
-            {4, 30.0f},
-            {5, 25.0f},
+            {3, 80.0f},
+            {4, 60.0f},
+            {5, 40.0f},
         };
         private AudioManager audioManager;
 

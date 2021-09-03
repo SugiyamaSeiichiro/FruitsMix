@@ -15,6 +15,7 @@ namespace PlayScene
         public List<GameObject> directionTextList;
         public GameObject frutisImagePrefab;
         public GameObject nextFruitsUIPrefab;
+        public GameObject nextFruitsUIParent;
         public GameObject fruitsTypeOrderParent;
         public GameObject frutisCompMapParent;
         public GameObject gameClearUI;
@@ -22,16 +23,16 @@ namespace PlayScene
 
         private List<GameObject> nextFruitsUIList = new List<GameObject>();
         private readonly Dictionary<int, float> fruitsSizeList = new Dictionary<int, float>(){
-            {3, 55.0f},
-            {4, 40.0f},
-            {5, 32.0f},
+            {3, 100.0f},
+            {4, 80.0f},
+            {5, 60.0f},
         };
         private readonly Dictionary<int, List<Vector2>> fruitsTypeOrderPositionList = new Dictionary<int, List<Vector2>>(){
-            {3, new List<Vector2>(){new Vector2(15.0f, 30.0f), new Vector2(30.0f,  0.0f), new Vector2(0.0f, 0.0f)}},
-            {4, new List<Vector2>(){new Vector2( 0.0f, 30.0f), new Vector2(30.0f, 30.0f), new Vector2(30.0f, 0.0f), new Vector2(0.0f, 0.0f)}},
-            {5, new List<Vector2>(){new Vector2( 5.0f, 30.0f), new Vector2(30.0f, 30.0f), new Vector2(40.0f, 0.0f), new Vector2(20.0f, 0.0f), new Vector2(0.0f, 0.0f)}},
+            {3, new List<Vector2>(){new Vector2(45.0f, 90.0f), new Vector2(90.0f,  0.0f), new Vector2(0.0f, 0.0f)}},
+            {4, new List<Vector2>(){new Vector2( 0.0f, 90.0f), new Vector2(90.0f, 30.0f), new Vector2(90.0f, 0.0f), new Vector2(0.0f, 0.0f)}},
+            {5, new List<Vector2>(){new Vector2(15.0f, 90.0f), new Vector2(90.0f, 30.0f), new Vector2(120.0f, 0.0f), new Vector2(60.0f, 0.0f), new Vector2(0.0f, 0.0f)}},
         };
-        private readonly float fruitsTypeOrderSize = 20.0f;
+        private readonly float fruitsTypeOrderSize = 60.0f;
 
         // 初期処理
         private void Start()
@@ -102,7 +103,7 @@ namespace PlayScene
             // 次フルーツUI作成
             GameObject obj = Instantiate(nextFruitsUIPrefab);
             obj.GetComponent<Image>().sprite = this.gameManagerScript.fruitsSpriteList[type];
-            obj.transform.SetParent(this.gameObject.transform, false);
+            obj.transform.SetParent(this.nextFruitsUIParent.transform, false);
             RectTransform rectTransform = obj.GetComponent<RectTransform>();
             rectTransform.sizeDelta = new Vector2(size, size);
             obj.transform.position = screenPos;

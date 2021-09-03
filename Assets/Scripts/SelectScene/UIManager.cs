@@ -11,8 +11,10 @@ namespace SelectScene
 
         public GameObject stageButtonPrefab;
         public GameObject stageInfoModalPrefab;
+        public GameObject stageInfoModalParent;
         public GameObject stageLockImagePrefab;
         public GameObject stageButtonParent;
+        public Image backGroundImage;
         public GameObject backPageButton;
         public GameObject nextPageButton;
 
@@ -54,7 +56,7 @@ namespace SelectScene
             nextPageButton.gameObject.SetActive(endNum < this.stageAllNum);
             // 背景色の変更
             int level = gameCommonScript.getSquareNum(startNum + 1) - 3;
-            Camera.main.backgroundColor = Utility.getLevelColor(level);
+            backGroundImage.color = Utility.getLevelColor(level);
         }
 
         // ステージボタン生成
@@ -89,7 +91,7 @@ namespace SelectScene
         // ステージ情報モーダル表示
         private void showStageInfoModal(int stageNum){
             GameObject obj = Instantiate(this.stageInfoModalPrefab);
-            obj.transform.SetParent(this.gameObject.transform, false);
+            obj.transform.SetParent(this.stageInfoModalParent.transform, false);
             obj.GetComponent<StageInfoModal>().setStageButtonInfo(stageNum);
             this.audioManager.playSE(SE_TYPE.BUTTON);
         }

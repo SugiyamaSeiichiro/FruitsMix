@@ -12,7 +12,7 @@ namespace Common
 
         public const int SELECT_STAGE_WIDTH_NUM = 5;
         public const int SELECT_STAGE_HEIGHT_NUM = 3;
-        public const float SELECT_STAGE_INTERVAL_NUM = 1.5f;
+        public const float SELECT_STAGE_INTERVAL_NUM = 1.2f;
 
         public const string initMapPath = "Conf/InitMap";
         public const string compMapPath = "Conf/CompMap";

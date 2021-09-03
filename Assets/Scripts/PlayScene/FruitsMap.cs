@@ -57,16 +57,20 @@ namespace PlayScene
             // フルーツオブジェクト配置
             this.fruitsObjectMap = new GameObject[this.columnNum, this.rowNum];
             // フルーツサイズ取得
-            this.fruitsScale = this.fruitsScaleList[this.squareNum];
+            float aspect = ((float)Screen.width / (float)Screen.height) / (1920.0f / 1080.0f);
+            this.fruitsScale = this.fruitsScaleList[this.squareNum] * aspect;
+            Vector3 parentPos = this.gameObject.transform.position;
+            parentPos.x += (1 - aspect) * 3.0f;
+            this.gameObject.transform.position = parentPos;
             // フルーツ配置箇所取得
             GameCommon gameCommonScript = GameObject.Find("GameCommon").GetComponent<GameCommon>();
-            List<float> fruitsPosList = gameCommonScript.getFruitsPosList(this.squareNum, fruitsScale);
+            List<float> fruitsPosList = gameCommonScript.getFruitsPosList(this.squareNum, this.fruitsScale);
             // 左上から右に生成していく
             for(int i = 0; i < this.columnNum; i++){
                 for(int j = 0; j < this.rowNum; j++){
                     // フルーツ生成
                     Vector3 position = new Vector2(fruitsPosList[j], -fruitsPosList[i]);
-                    this.fruitsObjectMap[i,j] = this.getFruitsObject(this.initMap[i,j], position, fruitsScale, this.gameObject);
+                    this.fruitsObjectMap[i,j] = this.getFruitsObject(this.initMap[i,j], position, this.fruitsScale, this.gameObject);
                     this.playMatchedBlink(j, i, false);
                 }
             }
@@ -146,7 +150,7 @@ namespace PlayScene
             foreach((int x,int y) value in changeFruitsList){
                 int type = this.curMap[value.y, value.x];
                 int nextType = this.getNextType(type);
-                float size = fruitsScale * 30.0f;
+                float size = this.fruitsScale * 80.0f;
                 Vector2 position = this.fruitsObjectMap[value.y, value.x].transform.position;
                 this.gameManagerScript.uiManagerScript.createNextFruitsUI(nextType, size, position);
             }
